@@ -10,6 +10,17 @@ import android.os.Build
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowInsetsController
+import android.window.OnBackInvokedDispatcher
+import androidx.activity.ComponentActivity
+import androidx.activity.addCallback
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.layout.onPlaced
+import androidx.core.os.BuildCompat
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
@@ -124,4 +135,31 @@ fun Activity.lockOrientationLandscape() {
 
 fun Activity.unlockOrientation() {
     requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+}
+
+fun ComponentActivity.registerOnBackPress(onBackPress: () -> Unit) {
+    if (Build.VERSION.SDK_INT >= 33) {
+        onBackInvokedDispatcher.registerOnBackInvokedCallback(
+            OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+        ) {
+            onBackPress()
+        }
+    } else {
+        onBackPressedDispatcher.addCallback(this /* lifecycle owner */) {
+            onBackPress()
+        }
+    }
+}
+
+@Composable
+fun Modifier.focusOnInitialVisibility(isVisible: MutableState<Boolean>): Modifier {
+    val focusRequester = remember { FocusRequester() }
+
+    return focusRequester(focusRequester)
+        .onPlaced {
+            if (!isVisible.value) {
+                focusRequester.requestFocus()
+                isVisible.value = true
+            }
+        }
 }

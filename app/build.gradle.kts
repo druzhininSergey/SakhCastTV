@@ -5,6 +5,7 @@ plugins {
     id("com.google.dagger.hilt.android")
     kotlin("plugin.serialization")
     alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.google.firebase.crashlytics)
 }
 
 android {
@@ -53,7 +54,12 @@ android {
 }
 
 dependencies {
-//accompanist.systemuicontroller
+    //Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.crashlytics)
+
+    //accompanist.systemuicontroller
     implementation(libs.accompanist.systemuicontroller)
 
     //kotlinx.serialization
@@ -103,15 +109,19 @@ dependencies {
 
     //material
     implementation(libs.androidx.material)
+    implementation(libs.androidx.material3)
+
+    //compose
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.activity.compose)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.tv.foundation)
     implementation(libs.androidx.tv.material)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)

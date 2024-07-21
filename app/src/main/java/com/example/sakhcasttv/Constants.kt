@@ -12,6 +12,7 @@ const val MOVIE_VIEW = "movie_view"
 const val SERIES_VIEW = "series_view"
 const val PLAYER = "player"
 const val SERIES_PLAYER = "series_player"
+const val MAIN_SCREEN = "main_screen"
 
 const val BASE_URL = "https://api.sakh.tv"
 const val TELEGRAM_URL = "https://t.me/sakhtvandroid"
