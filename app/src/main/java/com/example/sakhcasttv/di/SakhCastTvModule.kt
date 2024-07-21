@@ -13,6 +13,9 @@ import androidx.media3.exoplayer.ExoPlayer
 import com.example.sakhcasttv.BASE_URL
 import com.example.sakhcasttv.SHARED_PREFS_TOKEN_KEY
 import com.example.sakhcasttv.data.api_service.SakhCastApiService
+import com.example.sakhcasttv.data.firebase_messaging.CrashReporter
+import com.example.sakhcasttv.data.firebase_messaging.FirebaseCrashReporter
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
@@ -100,10 +103,10 @@ class SakhCastModule {
     }
 
 
-//    @Provides
-//    @Singleton
-//    fun provideCrashReporter(): CrashReporter {
-//        return FirebaseCrashReporter(FirebaseCrashlytics.getInstance())
-//    }
+    @Provides
+    @Singleton
+    fun provideCrashReporter(): CrashReporter {
+        return FirebaseCrashReporter(FirebaseCrashlytics.getInstance())
+    }
 
 }

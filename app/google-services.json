@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "212500116135",
+    "project_id": "sakh-cast-tv",
+    "storage_bucket": "sakh-cast-tv.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:212500116135:android:7d71a970f6830013c86182",
+        "android_client_info": {
+          "package_name": "com.example.sakhcasttv"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBC56pk_0kzwYt-cneSJAfW8a7bA0q8iMc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

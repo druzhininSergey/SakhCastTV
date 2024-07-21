@@ -1,48 +1,48 @@
 package com.example.sakhcasttv
 
+
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.tv.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Surface
+import com.example.sakhcasttv.data.registerOnBackPress
+import com.example.sakhcasttv.ui.MainScreen
+import com.example.sakhcasttv.ui.general.CustomDialog
 import com.example.sakhcasttv.ui.theme.SakhCastTVTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    @OptIn(ExperimentalTvMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            val displayDialog = remember {
+                mutableStateOf(false)
+            }
+
+            registerOnBackPress {
+                displayDialog.value = true
+            }
+            if (displayDialog.value) {
+                CustomDialog(openDialogCustom = displayDialog) {
+                    finish()
+                }
+            }
+
+
             SakhCastTVTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     shape = RectangleShape
                 ) {
-                    Greeting("Android")
+                    MainScreen()
                 }
             }
         }
-    }
-}
-
-@OptIn(ExperimentalTvMaterial3Api::class)
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    SakhCastTVTheme {
-        Greeting("Android")
     }
 }
