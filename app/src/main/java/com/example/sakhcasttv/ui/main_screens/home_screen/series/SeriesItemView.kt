@@ -43,14 +43,16 @@ import java.util.Locale
 @Composable
 fun PreviewSeriesItemView() {
     SeriesItemView(
-        com.example.sakhcasttv.data.samples.SeriesCardSample.seriesCard,
-    ) {}
+        seriesCard = com.example.sakhcasttv.data.samples.SeriesCardSample.seriesCard,
+        navigateToSeriesById = {},
+    )
 }
 
 @Composable
 fun SeriesItemView(
     seriesCard: SeriesCard,
     navigateToSeriesById: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val imageUrl = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) seriesCard.coverAlt + ".avif"
     else seriesCard.coverAlt + ".webp"
@@ -62,7 +64,7 @@ fun SeriesItemView(
     val brush = Brush.verticalGradient(listOf(backdropColor1, backdropColor2))
 
     Card(
-        modifier = Modifier
+        modifier = modifier
             .width(150.dp),
         onClick = { navigateToSeriesById(seriesCard.id.toString()) },
         shape = CardDefaults.shape(RectangleShape),

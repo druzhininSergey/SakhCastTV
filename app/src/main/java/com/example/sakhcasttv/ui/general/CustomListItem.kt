@@ -22,17 +22,24 @@ import com.example.sakhcasttv.CustomListItemColors
 fun CustomListItem(
     text: String? = null,
     onClick: (() -> Unit)? = null,
+    isSeries: Boolean,
     onClickWithParam: ((String, String) -> Unit)? = null,
-    category: Map. Entry<String, String>? = null,
+    category: Map.Entry<String, String>? = null,
 ) {
     ListItem(
         colors = CustomListItemColors.listItemColors(),
         shape = ListItemDefaults.shape(RoundedCornerShape(10.dp)),
         selected = false,
         onClick = {
-            onClick ?: onClickWithParam?.let {
-                it("${category?.value}.favorite",
-                    category?.key ?: "")
+            if (isSeries)
+                onClick ?: onClickWithParam?.let {
+                    it(
+                        "${category?.value}.favorite",
+                        category?.key ?: ""
+                    )
+                }
+            else onClick ?: onClickWithParam?.let {
+                it("category?.value", category?.key ?: "")
             }
         },
         headlineContent = {

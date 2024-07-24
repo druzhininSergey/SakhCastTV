@@ -18,7 +18,7 @@ fun MovieCategoryView(
     navigateToMovieByAlphaId: (String) -> Unit,
     navigateToCatalogAllMovies: () -> Unit
 ) {
-    CustomListItem(text = "Все фильмы", onClick = navigateToCatalogAllMovies)
+    CustomListItem(text = "Все фильмы", isSeries = false, onClick = navigateToCatalogAllMovies)
     LazyRow(
         modifier = Modifier.padding(vertical = Dimens.mainPadding),
         contentPadding = PaddingValues(start = Dimens.mainPadding, end = Dimens.mainPadding),

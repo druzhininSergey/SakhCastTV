@@ -1,5 +1,6 @@
 package com.example.sakhcasttv.ui.profile_screen
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,6 +38,7 @@ fun ProfileScreen(
     logInScreenViewModel: LogInScreenViewModel = hiltViewModel(),
 ) {
     val user = logInScreenViewModel.userDataState.observeAsState()
+    Log.i("!!!", "user = ${user.value?.currentUser?.login}")
     val avatarPainter: Painter =
         rememberAsyncImagePainter(
             ImageRequest.Builder(LocalContext.current).data(data = user.value?.currentUser?.avatar)
@@ -47,6 +50,10 @@ fun ProfileScreen(
         LogInScreenViewModel.UserDataState()
     )
     val currentUser = profileScreenState.value.currentUser
+
+    LaunchedEffect(Unit) {
+        logInScreenViewModel.checkLoggedUser()
+    }
 
     Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
         Box(

@@ -1,6 +1,5 @@
 package com.example.sakhcasttv.ui.main_screens.search_screen
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,7 +35,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
@@ -48,14 +46,13 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.TabRow
 import androidx.tv.material3.Text
 import com.example.sakhcasttv.Dimens
-import com.example.sakhcasttv.ui.main_screens.main_screen_tabrow.MenuItem
-import com.example.sakhcasttv.ui.main_screens.main_screen_tabrow.NavigationTabItem
+import com.example.sakhcasttv.ui.general.MenuItem
+import com.example.sakhcasttv.ui.general.NavigationTabItem
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SearchScreen(
     navigateToMovieByAlphaId: (String) -> Unit,
@@ -155,9 +152,9 @@ fun SearchScreen(
                     )
                 },
             ) {
-                pages.forEachIndexed { index, title ->
+                pages.forEachIndexed { index, page ->
                     NavigationTabItem(
-                        item = MenuItem(id = title, text = title),
+                        item = MenuItem(id = page, text = page),
                         isSelected = selectedTabIndex == index,
                         onMenuSelected = {
                             selectedTabIndex = index
@@ -169,7 +166,11 @@ fun SearchScreen(
                 }
             }
         }
-        Spacer(modifier = Modifier.height(5.dp).background(MaterialTheme.colorScheme.background))
+        Spacer(
+            modifier = Modifier
+                .height(5.dp)
+                .background(MaterialTheme.colorScheme.background)
+        )
         HorizontalPager(
             modifier = Modifier.background(MaterialTheme.colorScheme.background),
             state = pagerState,
@@ -179,7 +180,7 @@ fun SearchScreen(
                 columns = GridCells.Fixed(2),
                 modifier = Modifier
                     .padding()
-                    .background(MaterialTheme.colorScheme.primary)
+                    .background(MaterialTheme.colorScheme.background)
                     .fillMaxSize(),
                 horizontalArrangement = Arrangement.spacedBy(Dimens.mainPadding),
                 verticalArrangement = Arrangement.spacedBy(Dimens.mainPadding),

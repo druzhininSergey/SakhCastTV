@@ -27,7 +27,8 @@ fun ContinueWatchView(
     series: SeriesRecent,
     lastWatchedMovieTime: String,
     navigateToMovieByAlphaId: (String) -> Unit,
-    navigateToSeriesById: (String) -> Unit
+    navigateToSeriesById: (String) -> Unit,
+    modifier: Modifier
 ) {
     val pagerState = rememberPagerState { 2 }
     var tabIndex by remember {
@@ -44,7 +45,7 @@ fun ContinueWatchView(
         contentAlignment = Alignment.Center,
     ) {
         Row {
-            ContinueWatchSeriesView(series, navigateToSeriesById)
+            ContinueWatchSeriesView(series, navigateToSeriesById, modifier)
             Spacer(modifier = Modifier.width(30.dp))
             ContinueWatchMovieView(movie, lastWatchedMovieTime, navigateToMovieByAlphaId)
         }
