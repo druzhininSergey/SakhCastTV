@@ -1,5 +1,7 @@
 package com.example.sakhcasttv.ui
 
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -67,7 +69,11 @@ fun AuthNavGraph(
 
     NavHost(
         navController = navHostController,
-        startDestination = HOME_SCREEN
+        startDestination = HOME_SCREEN,
+        enterTransition = { slideInVertically(initialOffsetY = { -it }) },
+        exitTransition = { slideOutVertically(targetOffsetY = { it }) },
+//        popEnterTransition = { slideInVertically(initialOffsetY = { it }) },
+//        popExitTransition = { slideOutVertically(targetOffsetY = { -it }) }
     ) {
         composable(HOME_SCREEN) {
             HomeScreen(
