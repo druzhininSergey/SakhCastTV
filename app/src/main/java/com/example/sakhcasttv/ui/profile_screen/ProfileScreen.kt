@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,31 +21,31 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.sakhcasttv.CURRENT_VERSION
 import com.example.sakhcasttv.Colors
-import com.example.sakhcasttv.ui.log_in_screen.LogInScreenViewModel
+import com.example.sakhcasttv.model.CurrentUser
 
 @Composable
-fun ProfileScreen(
-    logInScreenViewModel: LogInScreenViewModel = hiltViewModel(),
-) {
-    val user = logInScreenViewModel.userDataState.observeAsState()
+fun ProfileScreen(user: CurrentUser?, onLogoutButtonPushed: () -> Unit) {
     val avatarPainter: Painter =
         rememberAsyncImagePainter(
-            ImageRequest.Builder(LocalContext.current).data(data = user.value?.currentUser?.avatar)
+            ImageRequest.Builder(LocalContext.current).data(data = user?.avatar)
                 .apply(block = fun ImageRequest.Builder.() {
                     crossfade(true)
                 }).build()
         )
-    val profileScreenState = logInScreenViewModel.userDataState.observeAsState(
-        LogInScreenViewModel.UserDataState()
-    )
-    val currentUser = profileScreenState.value.currentUser
+//    val profileScreenState = logInScreenViewModel.userDataState.observeAsState(
+//        LogInScreenViewModel.UserDataState()
+//    )
+//    val currentUser = profileScreenState.value.currentUser
+//
+//    LaunchedEffect(Unit) {
+//        logInScreenViewModel.checkLoggedUser()
+//    }
 
     Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
         Box(
@@ -82,11 +81,11 @@ fun ProfileScreen(
                     modifier = Modifier.padding(8.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    if (currentUser != null) {
-                        Text(text = currentUser.login)
+                    if (user != null) {
+                        Text(text = user.login ?: "")
                         Spacer(modifier = Modifier.height(15.dp))
                         Text(
-                            text = currentUser.proDays.toString() + "дн.",
+                            text = user.proDays.toString() + "дн.",
                             color = Color.Black,
                             modifier = Modifier
                                 .clip(MaterialTheme.shapes.small)
@@ -105,7 +104,7 @@ fun ProfileScreen(
 
         TextButton(
             onClick = {
-                logInScreenViewModel.onLogoutButtonPushed()
+                onLogoutButtonPushed()
             }, modifier = Modifier
                 .padding(16.dp)
                 .clip(MaterialTheme.shapes.small)

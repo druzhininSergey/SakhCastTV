@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.sakhcasttv.model.SeriesList
@@ -19,7 +17,7 @@ fun SeriesCategoryView(
     navigateToSeriesById: (String) -> Unit,
     navigateToCatalogAllSeries: () -> Unit
 ) {
-    CustomListItem(text = "Все сериалы", onClick = navigateToCatalogAllSeries)
+    CustomListItem(text = "Все сериалы", isSeries = true, onClick = navigateToCatalogAllSeries)
     LazyRow(
         modifier = Modifier.padding(vertical = 16.dp),
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp),

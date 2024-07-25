@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.DropdownMenu
@@ -19,11 +18,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Icon
 import androidx.tv.material3.ListItem
-import androidx.tv.material3.ListItemColors
 import androidx.tv.material3.ListItemDefaults
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
@@ -42,20 +39,18 @@ fun CatalogList(
     var selectedCategory by remember { mutableStateOf<String?>(null) }
 
     LazyColumn {
-       itemsIndexed(categories) { _, item ->
+        itemsIndexed(categories) { _, item ->
             ListItem(
                 colors = CustomListItemColors.listItemColors(),
                 shape = ListItemDefaults.shape(RoundedCornerShape(10.dp)),
                 selected = false,
                 onClick = {
-                    if (tabIndex == 0) {
-                        if (item == categories.first()) {
-                            expanded = true
-                        } else navigateToSeriesCategoryScreen(item)
+                    if (item == categories.first()) {
+                        expanded = true
                     } else {
-                        if (item == categories.first()) {
-                            expanded = true
-                        } else navigateToMoviesCategoryScreen(item)
+                        val navigateFunction =
+                            if (tabIndex == 0) navigateToSeriesCategoryScreen else navigateToMoviesCategoryScreen
+                        navigateFunction(item)
                     }
                 },
                 headlineContent = {
@@ -90,39 +85,37 @@ fun CatalogList(
         }
     }
 
-
     DropdownMenu(
         modifier = Modifier.background(MaterialTheme.colorScheme.background),
         expanded = expanded,
         onDismissRequest = { expanded = false }
     ) {
-        if (tabIndex == 0) {
-            Genres.seriesGenres.forEach { category ->
-                DropdownMenuItem(
-                    modifier = Modifier.background(MaterialTheme.colorScheme.background),
-                    onClick = {
-                        expanded = false
-                        selectedCategory = category
-                        navigateToSeriesCategoryScreen(category)
-                    }
-                ) {
-                    Text(text = category, color = MaterialTheme.colorScheme.onBackground)
-                }
-            }
-        } else {
-            Genres.movieGenresMap.keys.forEach { category ->
-                DropdownMenuItem(
-                    modifier = Modifier.background(MaterialTheme.colorScheme.background),
-                    onClick = {
-                        expanded = false
-                        selectedCategory = category
-                        navigateToMoviesCategoryScreen(category)
-                    }
-                ) {
-                    Text(text = category, color = MaterialTheme.colorScheme.onBackground)
-                }
-            }
+        val genresList = if (tabIndex == 0) Genres.seriesGenres else Genres.movieGenresMap.keys
+        genresList.forEach { category ->
+            ListItem(
+                colors = CustomListItemColors.listItemColors(),
+                shape = ListItemDefaults.shape(RoundedCornerShape(10.dp)),
+                selected = false,
+                onClick = {
+                    expanded = false
+                    selectedCategory = category
+                    val navigateFunction =
+                        if (tabIndex == 0) navigateToSeriesCategoryScreen else navigateToMoviesCategoryScreen
+                    navigateFunction(category)
+                },
+                headlineContent = {
+                    Text(
+                        text = category,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier.padding(start = 20.dp)
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .background(MaterialTheme.colorScheme.background)
+                    .clip(RoundedCornerShape(10.dp))
+            )
         }
-
     }
 }

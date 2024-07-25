@@ -24,8 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.TabRow
 import com.example.sakhcasttv.Genres
-import com.example.sakhcasttv.ui.main_screens.main_screen_tabrow.MenuItem
-import com.example.sakhcasttv.ui.main_screens.main_screen_tabrow.NavigationTabItem
+import com.example.sakhcasttv.ui.general.MenuItem
+import com.example.sakhcasttv.ui.general.NavigationTabItem
 import kotlinx.coroutines.launch
 
 @Composable
@@ -49,10 +49,11 @@ fun CatalogScreen(
         tabIndex = pagerState.currentPage
     }
 
-    Column {
+    Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
+//                .background(MaterialTheme.colorScheme.background)
                 .padding(top = 15.dp, bottom = 10.dp),
             contentAlignment = Alignment.Center
         ) {
@@ -66,9 +67,9 @@ fun CatalogScreen(
                     )
                 },
             ) {
-                pages.forEachIndexed { index, title ->
+                pages.forEachIndexed { index, page ->
                     NavigationTabItem(
-                        item = MenuItem(id = title, text = title),
+                        item = MenuItem(id = page, text = page),
                         isSelected = selectedTabIndex == index,
                         onMenuSelected = {
                             selectedTabIndex = index

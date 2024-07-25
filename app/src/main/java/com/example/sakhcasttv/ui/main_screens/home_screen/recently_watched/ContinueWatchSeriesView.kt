@@ -33,7 +33,8 @@ fun Preview1() {
 @Composable
 fun ContinueWatchSeriesView(
     seriesCard: SeriesRecent,
-    navigateToSeriesById: (String) -> Unit
+    navigateToSeriesById: (String) -> Unit,
+    modifier: Modifier
 ) {
     val imageUrl = seriesCard.data.backdropAlt + ".webp"
 
@@ -51,7 +52,7 @@ fun ContinueWatchSeriesView(
         )
     val brush = Brush.verticalGradient(listOf(backdropColor1, backdropColor2))
     Card(
-        modifier = Modifier
+        modifier = modifier
             .height(234.dp)
             .aspectRatio(16f / 9f),
         onClick = { navigateToSeriesById(seriesCard.data.id.toString()) },

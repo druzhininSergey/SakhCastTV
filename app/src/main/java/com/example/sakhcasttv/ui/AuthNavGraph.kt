@@ -1,23 +1,45 @@
 package com.example.sakhcasttv.ui
 
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.sakhcasttv.MAIN_SCREEN
+import com.example.sakhcasttv.CATALOG_SCREEN
+import com.example.sakhcasttv.FAVORITES_SCREEN
+import com.example.sakhcasttv.HOME_SCREEN
 import com.example.sakhcasttv.MOVIE_CATEGORY_SCREEN
 import com.example.sakhcasttv.MOVIE_VIEW
+import com.example.sakhcasttv.NOTIFICATION_SCREEN
 import com.example.sakhcasttv.PLAYER
+import com.example.sakhcasttv.PROFILE_SCREEN
+import com.example.sakhcasttv.SEARCH_SCREEN
 import com.example.sakhcasttv.SERIES_CATEGORY_SCREEN
 import com.example.sakhcasttv.SERIES_PLAYER
 import com.example.sakhcasttv.SERIES_VIEW
 import com.example.sakhcasttv.model.CurrentUser
-import com.example.sakhcasttv.ui.main_screens.main_screen_tabrow.MainScreenTabRow
+import com.example.sakhcasttv.ui.main_screens.MainScreensViewModel
+import com.example.sakhcasttv.ui.main_screens.catalog_screen.CatalogScreen
+import com.example.sakhcasttv.ui.main_screens.favorites_screen.FavoritesScreen
+import com.example.sakhcasttv.ui.main_screens.home_screen.HomeScreen
+import com.example.sakhcasttv.ui.main_screens.notifications_screen.NotificationScreen
+import com.example.sakhcasttv.ui.main_screens.notifications_screen.NotificationScreenViewModel
+import com.example.sakhcasttv.ui.main_screens.search_screen.SearchScreen
+import com.example.sakhcasttv.ui.profile_screen.ProfileScreen
 
 @Composable
 fun AuthNavGraph(
     navHostController: NavHostController,
     user: CurrentUser?,
+    paddingValues: PaddingValues,
+    onLogoutButtonPushed: () -> Unit,
+    mainScreensViewModel: MainScreensViewModel = hiltViewModel()
 ) {
     val navigateUp = { navHostController.navigateUp() }
     val navigate = { route: String -> navHostController.navigate(route) }
@@ -50,83 +72,67 @@ fun AuthNavGraph(
 
     NavHost(
         navController = navHostController,
-        startDestination = MAIN_SCREEN
+        startDestination = HOME_SCREEN,
+        enterTransition = { slideInVertically(initialOffsetY = { -it }) },
+        exitTransition = { slideOutVertically(targetOffsetY = { it }) },
     ) {
-        composable(MAIN_SCREEN) {
-            MainScreenTabRow(
-                navigateToMovieByAlphaId,
-                navigateToSeriesById,
-                navigateToCatalogAllSeries,
-                navigateToCatalogAllMovies,
-                navigateToSeriesCategoryScreen,
-                navigateToMoviesCategoryScreen,
-                navigateToSeriesCategoryByType,
-                navigateToMovieCategoriesByGenresId,
+        composable(HOME_SCREEN) {
+            HomeScreen(
+                navigateToMovieByAlphaId = navigateToMovieByAlphaId,
+                navigateToSeriesById = navigateToSeriesById,
+                navigateToCatalogAllSeries = navigateToCatalogAllSeries,
+                navigateToCatalogAllMovies = navigateToCatalogAllMovies,
+                allScreensHomeState = mainScreensViewModel.homeScreenState,
+                loadDataToHomeScreen = mainScreensViewModel::loadDataToHomeScreen,
             )
         }
-//        composable(HOME_SCREEN) {
-//            HomeScreen(
-//                navigateToMovieByAlphaId = navigateToMovieByAlphaId,
-//                navigateToSeriesById = navigateToSeriesById,
-//                navigateToCatalogAllSeries = navigateToCatalogAllSeries,
-//                navigateToCatalogAllMovies = navigateToCatalogAllMovies,
-//                allScreensHomeState = mainScreensViewModel.homeScreenState,
-//                loadDataToHomeScreen = mainScreensViewModel::loadDataToHomeScreen,
-//            )
-//        }
-//        composable(CATALOG_SCREEN) {
-//            val catalogScreenViewModel = hiltViewModel<CatalogScreenViewModel>()
-//            val catalogScreenState by
-//            catalogScreenViewModel.catalogScreenState.observeAsState(CatalogScreenViewModel.CatalogScreenState())
-//
-//            CatalogScreen(
-//                paddingValues = paddingValues,
-//                navigateToSeriesCategoryScreen = navigateToSeriesCategoryScreen,
-//                navigateToMoviesCategoryScreen = navigateToMoviesCategoryScreen,
-//                catalogScreenState = catalogScreenState
-//            )
-//        }
-//        composable(FAVORITES_SCREEN) {
-//            FavoritesScreen(
-//                paddingValues = paddingValues,
-//                navigateToMovieByAlphaId = navigateToMovieByAlphaId,
-//                navigateToSeriesById = navigateToSeriesById,
-//                navigateToSeriesCategoryByType = navigateToSeriesCategoryByType,
-//                navigateToMovieCategoriesByGenresId = navigateToMovieCategoriesByGenresId,
-//                allScreensFavoriteState = mainScreensViewModel.favoritesScreenState,
-//                loadDataToHomeScreen = mainScreensViewModel::loadDataToFavoritesScreen,
-//            )
-//        }
-//        composable(NOTIFICATION_SCREEN) {
-//            val notificationScreenViewModel: NotificationScreenViewModel = hiltViewModel()
-//            val notificationScreenState by notificationScreenViewModel.notificationScreenState.collectAsState()
-//            val allScreensNotificationsState by mainScreensViewModel.notificationScreenState.collectAsState()
-//            LaunchedEffect(Unit) {
-//                if (allScreensNotificationsState.notificationsList == null) {
-//                    notificationScreenViewModel.getNotifications()
-//                }
-//            }
-//            LaunchedEffect(notificationScreenState) {
-//                if (!notificationScreenState.isLoading) {
-//                    mainScreensViewModel.loadDataToNotificationsScreen(notificationScreenState)
-//                }
-//            }
-//
-//            NotificationScreen(
-//                paddingValues,
-//                allScreensNotificationsState,
-//                notificationScreenViewModel::makeAllNotificationsRead,
-//                notificationScreenViewModel::getNotifications,
-//                navigateToSeriesById
-//            )
-//        }
-//        composable(SEARCH_SCREEN) {
-//            SearchScreen(
-//                paddingValues = paddingValues,
-//                navigateToMovieByAlphaId = navigateToMovieByAlphaId,
-//                navigateToSeriesById = navigateToSeriesById
-//            )
-//        }
+        composable(CATALOG_SCREEN) {
+            CatalogScreen(
+                navigateToSeriesCategoryScreen = navigateToSeriesCategoryScreen,
+                navigateToMoviesCategoryScreen = navigateToMoviesCategoryScreen,
+            )
+        }
+        composable(FAVORITES_SCREEN) {
+            FavoritesScreen(
+                navigateToMovieByAlphaId = navigateToMovieByAlphaId,
+                navigateToSeriesById = navigateToSeriesById,
+                navigateToSeriesCategoryByType = navigateToSeriesCategoryByType,
+                navigateToMovieCategoriesByGenresId = navigateToMovieCategoriesByGenresId,
+                allScreensFavoriteState = mainScreensViewModel.favoritesScreenState,
+                loadDataToHomeScreen = mainScreensViewModel::loadDataToFavoritesScreen,
+            )
+        }
+        composable(NOTIFICATION_SCREEN) {
+            val notificationScreenViewModel: NotificationScreenViewModel = hiltViewModel()
+            val notificationScreenState by notificationScreenViewModel.notificationScreenState.collectAsState()
+            val allScreensNotificationsState by mainScreensViewModel.notificationScreenState.collectAsState()
+            LaunchedEffect(Unit) {
+                if (allScreensNotificationsState.notificationsList == null) {
+                    notificationScreenViewModel.getNotifications()
+                }
+            }
+            LaunchedEffect(notificationScreenState) {
+                if (!notificationScreenState.isLoading) {
+                    mainScreensViewModel.loadDataToNotificationsScreen(notificationScreenState)
+                }
+            }
+
+            NotificationScreen(
+                allScreensNotificationsState,
+                notificationScreenViewModel::makeAllNotificationsRead,
+                notificationScreenViewModel::getNotifications,
+                navigateToSeriesById
+            )
+        }
+        composable(SEARCH_SCREEN) {
+            SearchScreen(
+                navigateToMovieByAlphaId = navigateToMovieByAlphaId,
+                navigateToSeriesById = navigateToSeriesById
+            )
+        }
+        composable(PROFILE_SCREEN) {
+            ProfileScreen(user = user, onLogoutButtonPushed = onLogoutButtonPushed)
+        }
 //        composable("$MOVIE_VIEW/{movieId}") { backStackEntry ->
 //            val alphaId = backStackEntry.arguments?.getString("movieId")
 //            MovieView(

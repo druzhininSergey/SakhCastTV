@@ -1,5 +1,6 @@
 package com.example.sakhcasttv.ui
 
+import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
@@ -9,6 +10,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.sakhcasttv.model.CurrentUser
 import com.example.sakhcasttv.ui.log_in_screen.LogInScreen
 import com.example.sakhcasttv.ui.log_in_screen.LogInScreenViewModel
+import com.example.sakhcasttv.ui.main_screens.top_app_bar.TvTopBar
 
 @Composable
 fun MainScreen() {
@@ -28,7 +30,7 @@ fun MainScreen() {
     if (isLogged == false || isLogged == null) {
         LogInScreen(navController)
     } else {
-        AuthenticatedMainScreen(navController, user)
+        AuthenticatedMainScreen(navController, user, logInScreenViewModel::onLogoutButtonPushed)
     }
 }
 
@@ -36,9 +38,17 @@ fun MainScreen() {
 fun AuthenticatedMainScreen(
     navController: NavHostController,
     user: CurrentUser?,
+    onLogoutButtonPushed: () -> Unit,
 ) {
-    AuthNavGraph(
-        navHostController = navController,
-        user,
-    )
+    Scaffold(
+        topBar = { TvTopBar(navController = navController, user) }
+    ) { paddingValues ->
+        AuthNavGraph(
+            navHostController = navController,
+            user = user,
+            paddingValues = paddingValues,
+            onLogoutButtonPushed = onLogoutButtonPushed
+        )
+    }
+
 }

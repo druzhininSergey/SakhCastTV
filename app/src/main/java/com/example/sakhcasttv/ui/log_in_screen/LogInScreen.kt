@@ -28,10 +28,12 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.tv.material3.Button
@@ -101,6 +103,7 @@ fun LogInScreen(
             },
             leadingIcon = { Icon(imageVector = Icons.TwoTone.Person, contentDescription = null) },
             singleLine = true,
+            textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground, fontSize = 20.sp)
         )
         Spacer(modifier = Modifier.height(20.dp))
         OutlinedTextField(
@@ -137,7 +140,8 @@ fun LogInScreen(
                     val description = if (passwordHidden) "Show password" else "Hide password"
                     Icon(painter = visibilityIcon, contentDescription = description)
                 }
-            }
+            },
+            textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground, fontSize = 20.sp)
         )
         if (!logInScreenState.value.isPasswordCorrect) {
             Text(
