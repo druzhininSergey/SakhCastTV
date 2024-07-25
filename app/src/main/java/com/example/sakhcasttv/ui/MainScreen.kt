@@ -30,7 +30,7 @@ fun MainScreen() {
     if (isLogged == false || isLogged == null) {
         LogInScreen(navController)
     } else {
-        AuthenticatedMainScreen(navController, user)
+        AuthenticatedMainScreen(navController, user, logInScreenViewModel::onLogoutButtonPushed)
     }
 }
 
@@ -38,14 +38,16 @@ fun MainScreen() {
 fun AuthenticatedMainScreen(
     navController: NavHostController,
     user: CurrentUser?,
+    onLogoutButtonPushed: () -> Unit,
 ) {
     Scaffold(
-        topBar = { TvTopBar(navController = navController) }
+        topBar = { TvTopBar(navController = navController, user) }
     ) { paddingValues ->
         AuthNavGraph(
             navHostController = navController,
-            user,
-            paddingValues
+            user = user,
+            paddingValues = paddingValues,
+            onLogoutButtonPushed = onLogoutButtonPushed
         )
     }
 

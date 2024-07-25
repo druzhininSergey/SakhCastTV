@@ -47,7 +47,7 @@ fun SeriesPage(
                 }
                 item {
                     LazyRow(
-                        contentPadding = PaddingValues(horizontal = Dimens.mainPadding),
+                        contentPadding = PaddingValues(Dimens.mainPadding),
                         horizontalArrangement = Arrangement.spacedBy(Dimens.mainPadding),
                     ) {
                         itemsIndexed(

@@ -18,6 +18,7 @@ import com.example.sakhcasttv.MOVIE_CATEGORY_SCREEN
 import com.example.sakhcasttv.MOVIE_VIEW
 import com.example.sakhcasttv.NOTIFICATION_SCREEN
 import com.example.sakhcasttv.PLAYER
+import com.example.sakhcasttv.PROFILE_SCREEN
 import com.example.sakhcasttv.SEARCH_SCREEN
 import com.example.sakhcasttv.SERIES_CATEGORY_SCREEN
 import com.example.sakhcasttv.SERIES_PLAYER
@@ -30,12 +31,14 @@ import com.example.sakhcasttv.ui.main_screens.home_screen.HomeScreen
 import com.example.sakhcasttv.ui.main_screens.notifications_screen.NotificationScreen
 import com.example.sakhcasttv.ui.main_screens.notifications_screen.NotificationScreenViewModel
 import com.example.sakhcasttv.ui.main_screens.search_screen.SearchScreen
+import com.example.sakhcasttv.ui.profile_screen.ProfileScreen
 
 @Composable
 fun AuthNavGraph(
     navHostController: NavHostController,
     user: CurrentUser?,
     paddingValues: PaddingValues,
+    onLogoutButtonPushed: () -> Unit,
     mainScreensViewModel: MainScreensViewModel = hiltViewModel()
 ) {
     val navigateUp = { navHostController.navigateUp() }
@@ -72,8 +75,6 @@ fun AuthNavGraph(
         startDestination = HOME_SCREEN,
         enterTransition = { slideInVertically(initialOffsetY = { -it }) },
         exitTransition = { slideOutVertically(targetOffsetY = { it }) },
-//        popEnterTransition = { slideInVertically(initialOffsetY = { it }) },
-//        popExitTransition = { slideOutVertically(targetOffsetY = { -it }) }
     ) {
         composable(HOME_SCREEN) {
             HomeScreen(
@@ -128,6 +129,9 @@ fun AuthNavGraph(
                 navigateToMovieByAlphaId = navigateToMovieByAlphaId,
                 navigateToSeriesById = navigateToSeriesById
             )
+        }
+        composable(PROFILE_SCREEN) {
+            ProfileScreen(user = user, onLogoutButtonPushed = onLogoutButtonPushed)
         }
 //        composable("$MOVIE_VIEW/{movieId}") { backStackEntry ->
 //            val alphaId = backStackEntry.arguments?.getString("movieId")
