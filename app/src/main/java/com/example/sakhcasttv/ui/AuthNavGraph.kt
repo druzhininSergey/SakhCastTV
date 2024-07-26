@@ -31,6 +31,7 @@ import com.example.sakhcasttv.ui.main_screens.home_screen.HomeScreen
 import com.example.sakhcasttv.ui.main_screens.notifications_screen.NotificationScreen
 import com.example.sakhcasttv.ui.main_screens.notifications_screen.NotificationScreenViewModel
 import com.example.sakhcasttv.ui.main_screens.search_screen.SearchScreen
+import com.example.sakhcasttv.ui.movie_series_view.MovieView
 import com.example.sakhcasttv.ui.profile_screen.ProfileScreen
 
 @Composable
@@ -133,17 +134,16 @@ fun AuthNavGraph(
         composable(PROFILE_SCREEN) {
             ProfileScreen(user = user, onLogoutButtonPushed = onLogoutButtonPushed)
         }
-//        composable("$MOVIE_VIEW/{movieId}") { backStackEntry ->
-//            val alphaId = backStackEntry.arguments?.getString("movieId")
-//            MovieView(
-//                paddingValues = paddingValues,
-//                alphaId = alphaId,
-//                navigateToMoviePlayer = navigateToMoviePlayer,
-//                navigateToMovieByAlphaId = navigateToMovieByAlphaId,
-//                navigateToMovieCategoriesByGenresId = navigateToMovieCategoriesByGenresId,
-//                navigateUp = navigateUp
-//            )
-//        }
+        composable("$MOVIE_VIEW/{movieId}") { backStackEntry ->
+            val alphaId = backStackEntry.arguments?.getString("movieId")
+
+            MovieView(
+                alphaId = alphaId,
+                navigateToMoviePlayer = navigateToMoviePlayer,
+                navigateToMovieByAlphaId = navigateToMovieByAlphaId,
+                navigateToMovieCategoriesByGenresId = navigateToMovieCategoriesByGenresId,
+            )
+        }
 //        composable("$SERIES_VIEW/{seriesId}") { backStackEntry ->
 //            val seriesId = backStackEntry.arguments?.getString("seriesId")?.toIntOrNull()
 //            SeriesView(
