@@ -3,6 +3,7 @@ package com.example.sakhcasttv.ui.main_screens.home_screen.series
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
@@ -24,7 +25,11 @@ fun SeriesCategoryView(
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         itemsIndexed(items = seriesList.items, key = { _, series -> series.id }) { _, item ->
-            SeriesItemView(seriesCard = item, navigateToSeriesById)
+            SeriesItemView(
+                seriesCard = item,
+                navigateToSeriesById = navigateToSeriesById,
+                modifier = Modifier.width(150.dp)
+            )
         }
     }
 }

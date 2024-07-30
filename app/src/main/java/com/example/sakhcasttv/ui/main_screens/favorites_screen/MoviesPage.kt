@@ -2,10 +2,12 @@ package com.example.sakhcasttv.ui.main_screens.favorites_screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.sakhcasttv.Dimens
 import com.example.sakhcasttv.model.MovieList
@@ -21,6 +23,7 @@ fun MoviesPage(
 ) {
     val categoryNames =
         mapOf("Буду смотреть" to "movie.favorite.will", "Просмотренные" to "movie.favorite.watched")
+
     LazyColumn(contentPadding = PaddingValues(bottom = 16.dp)) {
         item {
             MovieSection(
@@ -61,7 +64,8 @@ fun MovieSection(
             items(items = movieList.items, key = { it.id }) { movie ->
                 MovieItemView(
                     movieCard = movie,
-                    navigateToMovieByAlphaId = navigateToMovieByAlphaId
+                    navigateToMovieByAlphaId = navigateToMovieByAlphaId,
+                    modifier = Modifier.width(150.dp)
                 )
             }
         }

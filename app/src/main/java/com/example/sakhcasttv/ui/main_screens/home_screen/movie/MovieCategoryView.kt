@@ -3,10 +3,12 @@ package com.example.sakhcasttv.ui.main_screens.home_screen.movie
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.example.sakhcasttv.Dimens
 import com.example.sakhcasttv.model.MovieList
 import com.example.sakhcasttv.ui.general.CustomListItem
@@ -28,7 +30,11 @@ fun MovieCategoryView(
             items = movieList.items,
             key = { it.id }
         ) { item ->
-            MovieItemView(movieCard = item, navigateToMovieByAlphaId)
+            MovieItemView(
+                movieCard = item,
+                navigateToMovieByAlphaId = navigateToMovieByAlphaId,
+                modifier = Modifier.width(150.dp)
+            )
         }
     }
 }
