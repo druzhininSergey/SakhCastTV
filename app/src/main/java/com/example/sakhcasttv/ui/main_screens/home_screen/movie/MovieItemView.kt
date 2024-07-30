@@ -8,11 +8,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -43,14 +42,16 @@ import java.util.Locale
 @Composable
 fun PreviewMovieItemView() {
     MovieItemView(
-        com.example.sakhcasttv.data.samples.MovieCardSample.movieCard
-    ) { _ -> }
+        movieCard = com.example.sakhcasttv.data.samples.MovieCardSample.movieCard,
+        navigateToMovieByAlphaId = { _ -> }
+    )
 }
 
 @Composable
 fun MovieItemView(
     movieCard: MovieCard,
     navigateToMovieByAlphaId: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val imageUrl = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         movieCard.coverAlt + ".avif"
@@ -65,8 +66,8 @@ fun MovieItemView(
     val brush = Brush.verticalGradient(listOf(backdropColor1, backdropColor2))
 
     Card(
-        modifier = Modifier
-            .width(150.dp),
+        modifier = modifier
+            .aspectRatio(250f / 366f),
         onClick = { navigateToMovieByAlphaId(movieCard.idAlpha) },
         shape = CardDefaults.shape(RectangleShape),
         border = CardDefaults.border(
@@ -79,13 +80,16 @@ fun MovieItemView(
         )
     ) {
         Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
-            Box {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            ) {
                 SubcomposeAsyncImage(
                     model = imageUrl,
                     contentDescription = null,
                     modifier = Modifier
-                        .width(150.dp)
-                        .height(220.dp)
+                        .fillMaxSize()
                         .clip(RoundedCornerShape(10.dp)),
                     contentScale = ContentScale.FillBounds,
                     loading = {
@@ -168,11 +172,11 @@ fun MovieItemView(
                 color = MaterialTheme.colorScheme.onBackground,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.width(150.dp)
+                modifier = Modifier.fillMaxWidth()
             )
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.width(150.dp)
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
                     text = movieCard.releaseDate.take(4),

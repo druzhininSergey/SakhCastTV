@@ -2,10 +2,13 @@ package com.example.sakhcasttv.ui.main_screens.favorites_screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.example.sakhcasttv.Dimens
 import com.example.sakhcasttv.model.SeriesList
 import com.example.sakhcasttv.ui.general.CustomListItem
@@ -56,6 +59,7 @@ fun SeriesPage(
                             SeriesItemView(
                                 seriesCard = series,
                                 navigateToSeriesById = navigateToSeriesById,
+                                modifier = Modifier.width(150.dp)
                             )
                         }
                     }

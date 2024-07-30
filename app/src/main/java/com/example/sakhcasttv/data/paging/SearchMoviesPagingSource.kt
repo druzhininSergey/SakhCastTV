@@ -13,7 +13,7 @@ class SearchMoviesPagingSource(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MovieCard> {
         try {
             val page = params.key ?: 0
-            val seriesList = searchSeries(textInput, page)
+            val seriesList = searchMovies(textInput, page)
             val nextKey = if (seriesList?.items?.size == 40) page + 1 else null
 
             return LoadResult.Page(
@@ -26,9 +26,8 @@ class SearchMoviesPagingSource(
         }
     }
 
-    private suspend fun searchSeries(textInput: String, page: Int) =
+    private suspend fun searchMovies(textInput: String, page: Int) =
         sakhCastRepository.searchMovie(textInput, page)
-
 
     override fun getRefreshKey(state: PagingState<Int, MovieCard>): Int? {
         return state.anchorPosition?.let { anchorPosition ->
