@@ -1,9 +1,9 @@
 package com.example.sakhcasttv.data.repository
 
+import android.util.Log
 import com.example.sakhcasttv.data.api_service.SakhCastApiService
 import com.example.sakhcasttv.data.firebase_messaging.CrashReporter
 import com.example.sakhcasttv.model.CurrentUser
-import com.example.sakhcasttv.model.Episode
 import com.example.sakhcasttv.model.LastWatched
 import com.example.sakhcasttv.model.LoginResponse
 import com.example.sakhcasttv.model.Movie
@@ -175,7 +175,7 @@ class SakhCastRepository @Inject constructor(
             try {
                 val seriesCall = sakhCastApiService.getSeriesById(seriesId)
                 val responseBody = seriesCall.execute()
-//                Log.i("!!!", "seriesCall}")
+                Log.i("!!!", "seriesCall}")
                 responseBody.body()
             } catch (e: Exception) {
                 crashReporter.apply {
@@ -183,8 +183,8 @@ class SakhCastRepository @Inject constructor(
                     setCustomKey("error_message", e.message ?: "Unknown error")
                     recordException(e)
                 }
-//                Log.i("!!!", "seriesById = exception")
-//                Log.i("!!!", "${e.message}")
+                Log.i("!!!", "seriesById = exception")
+                Log.i("!!!", "${e.message}")
                 null
             }
         }
@@ -211,26 +211,26 @@ class SakhCastRepository @Inject constructor(
         }
     }
 
-    suspend fun getSeriesEpisodesBySeasonId(seasonId: Int): List<Episode>? {
-        return withContext(ioDispatcher) {
-            try {
-                val episodesListCall = sakhCastApiService.getSeriesEpisodesBySeasonId(seasonId)
-                val responseBody = episodesListCall.execute()
-//                Log.i("!!!", "Episodes from repo = ${responseBody.body()}")
-//                Log.i("!!!", "episodesListCall")
-                responseBody.body()
-            } catch (e: Exception) {
-                crashReporter.apply {
-                    logError("Error in getSeriesEpisodesBySeasonId")
-                    setCustomKey("error_message", e.message ?: "Unknown error")
-                    recordException(e)
-                }
-//                Log.i("!!!", "Episodes = exception")
-//                Log.i("!!!", "${e.message}")
-                null
-            }
-        }
-    }
+//    suspend fun getSeriesEpisodesBySeasonId(seasonId: Int): List<Episode>? {
+//        return withContext(ioDispatcher) {
+//            try {
+//                val episodesListCall = sakhCastApiService.getSeriesEpisodesBySeasonId(seasonId)
+//                val responseBody = episodesListCall.execute()
+////                Log.i("!!!", "Episodes from repo = ${responseBody.body()}")
+////                Log.i("!!!", "episodesListCall")
+//                responseBody.body()
+//            } catch (e: Exception) {
+//                crashReporter.apply {
+//                    logError("Error in getSeriesEpisodesBySeasonId")
+//                    setCustomKey("error_message", e.message ?: "Unknown error")
+//                    recordException(e)
+//                }
+////                Log.i("!!!", "Episodes = exception")
+////                Log.i("!!!", "${e.message}")
+//                null
+//            }
+//        }
+//    }
 
     suspend fun addSeriesInFavorites(seriesId: Int, kind: String): String? {
         return withContext(ioDispatcher) {

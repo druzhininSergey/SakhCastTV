@@ -32,6 +32,7 @@ import com.example.sakhcasttv.ui.main_screens.notifications_screen.NotificationS
 import com.example.sakhcasttv.ui.main_screens.notifications_screen.NotificationScreenViewModel
 import com.example.sakhcasttv.ui.main_screens.search_screen.SearchScreen
 import com.example.sakhcasttv.ui.movie_series_view.MovieView
+import com.example.sakhcasttv.ui.movie_series_view.SeriesView
 import com.example.sakhcasttv.ui.profile_screen.ProfileScreen
 
 @Composable
@@ -144,17 +145,15 @@ fun AuthNavGraph(
                 navigateToMovieCategoriesByGenresId = navigateToMovieCategoriesByGenresId,
             )
         }
-//        composable("$SERIES_VIEW/{seriesId}") { backStackEntry ->
-//            val seriesId = backStackEntry.arguments?.getString("seriesId")?.toIntOrNull()
-//            SeriesView(
-//                paddingValues = paddingValues,
-//                navigateUp = navigateUp,
-//                seriesId = seriesId,
-//                navigateToSeriesCategoryByCompany = navigateToSeriesCategoryByType,
-//                navigateToSeriesCategoryScreen = navigateToSeriesCategoryScreen,
-//                navigateToSeriesPlayer = navigateToSeriesPlayer
-//            )
-//        }
+        composable("$SERIES_VIEW/{seriesId}") { backStackEntry ->
+            val seriesId = backStackEntry.arguments?.getString("seriesId")?.toIntOrNull()
+            SeriesView(
+                seriesId = seriesId,
+                navigateToSeriesCategoryByCompany = navigateToSeriesCategoryByType,
+                navigateToSeriesCategoryScreen = navigateToSeriesCategoryScreen,
+                navigateToSeriesPlayer = navigateToSeriesPlayer
+            )
+        }
 //        composable("$MOVIE_CATEGORY_SCREEN/{category}/{genresId}") { backStackEntry ->
 //            val searchCategoryNameUri = backStackEntry.arguments?.getString("category") ?: "Все"
 //            val searchCategoryName = Uri.decode(searchCategoryNameUri)

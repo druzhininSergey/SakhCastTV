@@ -2,7 +2,8 @@ package com.example.sakhcasttv.ui.movie_series_view
 
 import android.os.Build
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,79 +15,152 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Card
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.tv.material3.Card
+import androidx.tv.material3.CardDefaults
+import androidx.tv.material3.Icon
+import androidx.tv.material3.MaterialTheme
+import androidx.tv.material3.TabRow
+import androidx.tv.material3.TabRowDefaults
+import androidx.tv.material3.Text
 import coil.compose.SubcomposeAsyncImage
 import com.example.sakhcasttv.Colors
+import com.example.sakhcasttv.Dimens
 import com.example.sakhcasttv.R
-import com.example.sakhcasttv.data.samples.SeriesEpisodesSample
-import com.example.sakhcasttv.model.Episode
+import com.example.sakhcasttv.model.Season
+import com.example.sakhcasttv.model.SeriesEpisode
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewSeriesEpisodeView() {
-    val episodes = SeriesEpisodesSample.getSeriesEpisodesList()
-    SeriesEpisodeView(episodes, navigateToSeriesPlayer = { _, _, _, _ ->
-    }, 0, "")
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewSeriesEpisodeItemView() {
-    val episodes = SeriesEpisodesSample.getSeriesEpisodesList()[0]
-    SeriesEpisodeItemView(seriesEpisode = episodes, navigateToSeriesPlayer = { _, _, _, _ ->
-    }, seasonId = 0, seriesName = "", "")
-}
-
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SeriesEpisodeView(
-    episodes: List<Episode>,
+    episodes: List<Season>?,
     navigateToSeriesPlayer: (String, String, String, String) -> Unit,
     seasonId: Int,
     seriesName: String,
 ) {
-    LazyRow(
-        modifier = Modifier,
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        contentPadding = PaddingValues(top = 16.dp, start = 16.dp, end = 16.dp)
-    ) {
-        itemsIndexed(episodes) { _, episode ->
-            SeriesEpisodeItemView(
-                seriesEpisode = episode,
-                navigateToSeriesPlayer = navigateToSeriesPlayer,
-                seasonId, seriesName, episode.index,
-            )
+    var focusedTabIndex by remember { mutableIntStateOf(0) }
+    var activeTabIndex by remember { mutableIntStateOf(focusedTabIndex) }
+
+    Column {
+        if (!episodes.isNullOrEmpty()) {
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+            ) {
+                Row (verticalAlignment = Alignment.CenterVertically){
+                    Text(text = "Сезоны:")
+                    TabRow(
+                        selectedTabIndex = focusedTabIndex,
+                        indicator = { tabPositions, doesTabRowHaveFocus ->
+                            //Focused
+                            TabRowDefaults.PillIndicator(
+                                currentTabPosition = tabPositions[focusedTabIndex],
+                                activeColor = Color.White,
+                                inactiveColor = Color.Transparent,
+                                doesTabRowHaveFocus = doesTabRowHaveFocus,
+                            )
+                            //Selected
+                            TabRowDefaults.PillIndicator(
+                                currentTabPosition = tabPositions[activeTabIndex],
+                                doesTabRowHaveFocus = doesTabRowHaveFocus,
+                                activeColor = Color.Gray,
+                                inactiveColor = Color.Gray,
+                            )
+                        },
+                        modifier = Modifier
+                            .focusRestorer()
+                    ) {
+                        repeat(episodes.size) { index ->
+                            key(index) {
+                                val mutableInteractionSource = remember { MutableInteractionSource() }
+                                val isFocused by mutableInteractionSource.collectIsFocusedAsState()
+                                val isSelected = activeTabIndex == index
+
+                                Card(
+                                    scale = CardDefaults.scale(),
+                                    modifier = Modifier
+                                        .background(MaterialTheme.colorScheme.surface)
+                                        .padding(8.dp),
+                                    onClick = {
+                                        focusedTabIndex = index
+                                        activeTabIndex = index
+                                    },
+                                    interactionSource = mutableInteractionSource,
+                                    colors = CardDefaults.colors(
+                                        containerColor = when {
+                                            isSelected -> Color.DarkGray
+                                            isFocused -> Color.Gray
+                                            else -> MaterialTheme.colorScheme.surface
+                                        },
+                                        focusedContainerColor = Color.Gray,
+                                    )
+                                ) {
+                                    Text(
+                                        text = "${index + 1}",
+                                        fontSize = 12.sp,
+                                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(5),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(Dimens.mainPadding),
+            modifier = Modifier.height(500.dp)
+        ) {
+            if (episodes != null) {
+                itemsIndexed(episodes[activeTabIndex].episodes) { _, episode ->
+                    SeriesEpisodeItemView(
+                        seriesEpisode = episode,
+                        navigateToSeriesPlayer = navigateToSeriesPlayer,
+                        seasonId = seasonId,
+                        seriesName = seriesName,
+                        episodeChosenIndex = episode.index,
+                    )
+                }
+            }
         }
     }
-
 }
 
 @Composable
 fun SeriesEpisodeItemView(
-    seriesEpisode: Episode,
+    seriesEpisode: SeriesEpisode,
     navigateToSeriesPlayer: (String, String, String, String) -> Unit,
     seasonId: Int,
     seriesName: String,
@@ -122,24 +196,30 @@ fun SeriesEpisodeItemView(
     ).random()
     val brush = Brush.verticalGradient(listOf(backdropColor1, backdropColor2))
 
-    Card(modifier = Modifier
-        .width(190.dp)
-        .clickable {
-            if (seriesEpisode.rgs.size == 1) {
+    Card(
+        colors = CardDefaults.colors(containerColor = MaterialTheme.colorScheme.surface),
+        modifier = Modifier
+            .width(190.dp)
+            .background(MaterialTheme.colorScheme.surface),
+        onClick = {
+            if (seriesEpisode.medias.size == 1) {
                 navigateToSeriesPlayer(
                     seasonId.toString(),
                     seriesName,
                     episodeChosenIndex,
-                    seriesEpisode.rgs[0].rg
+                    seriesEpisode.medias[0].name
                 )
             } else
                 isExpanded = true
-        }) {
-        Box() {
+        },
+    ) {
+        Box {
             SubcomposeAsyncImage(
                 model = imageUrl,
                 contentDescription = null,
-                modifier = Modifier.height(123.dp),
+                modifier = Modifier
+                    .height(123.dp)
+                    .clip(RoundedCornerShape(10.dp)),
                 contentScale = ContentScale.Crop,
                 loading = {
                     Box(
@@ -172,13 +252,13 @@ fun SeriesEpisodeItemView(
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp)
         ) {
-            Text(text = seriesEpisode.name, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(text = seriesEpisode.name, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 12.sp)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = seriesEpisode.date)
+                Text(text = seriesEpisode.date, fontSize = 10.sp)
                 if (seriesEpisode.isViewed == 0)
                     Icon(
                         painterResource(id = R.drawable.ic_circle),
@@ -195,15 +275,15 @@ fun SeriesEpisodeItemView(
             expanded = isExpanded,
             onDismissRequest = { isExpanded = false },
         ) {
-            seriesEpisode.rgs.forEach { rgs ->
+            seriesEpisode.medias.forEach { rgs ->
                 DropdownMenuItem(
-                    text = { Text(text = rgs.runame) },
+                    text = { Text(text = rgs.ruName) },
                     onClick = {
                         navigateToSeriesPlayer(
                             seasonId.toString(),
                             seriesName,
                             episodeChosenIndex,
-                            rgs.rg
+                            rgs.name
                         )
                         isExpanded = false
                     },

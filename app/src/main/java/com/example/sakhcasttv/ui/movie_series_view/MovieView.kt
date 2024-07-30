@@ -192,7 +192,7 @@ fun AddInFavoritesButton(
             "Просмотренно" to "watched"
         )
     }
-    Box(Modifier.padding(end = 60.dp)) {
+    Box {
         Button(
             shape = ButtonDefaults.shape(RoundedCornerShape(4.dp)),
             colors = ButtonDefaults.colors(
@@ -271,7 +271,8 @@ fun FullInfo(movie: Movie) {
             text = movie.overview,
             fontSize = 12.sp,
             color = MaterialTheme.colorScheme.onSecondary,
-            fontFamily = FontFamily(Font(R.font.jura_bold))
+            fontFamily = FontFamily(Font(R.font.jura_bold)),
+            lineHeight = 14.sp
         )
         Spacer(modifier = Modifier.height(20.dp))
         Text(

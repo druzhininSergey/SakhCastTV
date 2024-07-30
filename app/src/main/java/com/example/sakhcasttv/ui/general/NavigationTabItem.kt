@@ -1,7 +1,6 @@
 package com.example.sakhcasttv.ui.general
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.padding
@@ -49,11 +48,6 @@ fun TabRowScope.NavigationTabItem(
                     isSelected -> Color.DarkGray
                     else -> Color.Transparent
                 },
-                shape = MaterialTheme.shapes.small,
-            )
-            .border(
-                width = 0.5.dp,
-                color = MaterialTheme.colorScheme.onBackground,
                 shape = MaterialTheme.shapes.small,
             )
     ) {
