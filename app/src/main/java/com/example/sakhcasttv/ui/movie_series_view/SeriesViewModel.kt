@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sakhcasttv.data.repository.SakhCastRepository
-import com.example.sakhcasttv.model.Episode
 import com.example.sakhcasttv.model.Series
 import com.example.sakhcasttv.model.UserContinueWatchSeries
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,7 +20,7 @@ class SeriesViewModel @Inject constructor(private val sakhCastRepository: SakhCa
 
     data class SeriesState(
         var series: Series? = null,
-        var episodeList: List<Episode> = emptyList(),
+//        var episodeList: List<Episode> = emptyList(),
         val isFavorite: Boolean? = null,
     )
 
@@ -38,12 +37,12 @@ class SeriesViewModel @Inject constructor(private val sakhCastRepository: SakhCa
         }
     }
 
-    fun getSeriesEpisodesBySeasonId(seasonId: Int) {
-        viewModelScope.launch {
-            val episodeList = sakhCastRepository.getSeriesEpisodesBySeasonId(seasonId)
-            _seriesState.value = episodeList?.let { seriesState.value?.copy(episodeList = it) }
-        }
-    }
+//    fun getSeriesEpisodesBySeasonId(seasonId: Int) {
+//        viewModelScope.launch {
+//            val episodeList = sakhCastRepository.getSeriesEpisodesBySeasonId(seasonId)
+//            _seriesState.value = episodeList?.let { seriesState.value?.copy(episodeList = it) }
+//        }
+//    }
 
     fun onFavoriteButtonPushed(kind: String) {
         viewModelScope.launch {
@@ -63,20 +62,22 @@ class SeriesViewModel @Inject constructor(private val sakhCastRepository: SakhCa
     }
 
     fun getLastMediaData(): UserContinueWatchSeries? {
-        val episodeList = _seriesState.value?.episodeList
+        val episodeList = _seriesState.value?.series?.seasons
         val lastEpisodeId = _seriesState.value?.series?.userLastMediaId
         val lastSeasonId = _seriesState.value?.series?.userLastSeasonId ?: 0
         val lastMediaTime = _seriesState.value?.series?.userLastMediaTime ?: 0
         if (episodeList != null) {
             for (episode in episodeList) {
-                for (rg in episode.rgs) {
-                    if (rg.id == lastEpisodeId) {
-                        return UserContinueWatchSeries(
-                            lastMediaIndex = episode.index.toIntOrNull() ?: 1,
-                            lastRgWatched = rg.rg,
-                            lastSeasonId = lastSeasonId,
-                            userLastTime = lastMediaTime
-                        )
+                for (rg in episode.episodes) {
+                    for (i in rg.medias) {
+                        if (rg.id == lastEpisodeId) {
+                            return UserContinueWatchSeries(
+                                lastMediaIndex = episode.index.toIntOrNull() ?: 1,
+                                lastRgWatched = rg.name,
+                                lastSeasonId = lastSeasonId,
+                                userLastTime = lastMediaTime
+                            )
+                        }
                     }
                 }
             }

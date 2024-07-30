@@ -56,7 +56,8 @@ data class Network(
 @Serializable
 data class Season(
     @SerialName("id") val id: Int,
-    @SerialName("index") val index: String
+    @SerialName("index") val index: String,
+    @SerialName("episodes") val episodes: List<SeriesEpisode>
 )
 
 @Serializable
