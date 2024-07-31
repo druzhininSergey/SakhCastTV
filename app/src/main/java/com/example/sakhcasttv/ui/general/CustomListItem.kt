@@ -31,15 +31,16 @@ fun CustomListItem(
         shape = ListItemDefaults.shape(RoundedCornerShape(10.dp)),
         selected = false,
         onClick = {
-            if (isSeries)
-                onClick ?: onClickWithParam?.let {
-                    it(
-                        "${category?.value}.favorite",
-                        category?.key ?: ""
-                    )
+            if (isSeries) {
+                if (onClick != null) onClick()
+                else onClickWithParam?.let {
+                    it("${category?.value}.favorite", category?.key ?: "")
                 }
-            else onClick ?: onClickWithParam?.let {
-                it(category?.key ?: "", category?.value ?: "")
+            } else {
+                if (onClick != null) onClick()
+                else onClickWithParam?.let {
+                    it(category?.key ?: "", category?.value ?: "")
+                }
             }
         },
         headlineContent = {

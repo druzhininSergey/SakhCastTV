@@ -1,6 +1,5 @@
 package com.example.sakhcasttv.ui.category_screens
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,7 +17,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -76,13 +74,6 @@ fun SeriesCategoryScreen(
 
             seriesPagingDataFlow != null -> {
                 val seriesPagingItems = seriesPagingDataFlow!!.collectAsLazyPagingItems()
-
-                LaunchedEffect(seriesPagingItems) {
-                    snapshotFlow { seriesPagingItems.itemCount }
-                        .collect { count ->
-                            Log.d("!!!", "Number of movie items: $count")
-                        }
-                }
 
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(minSize = 150.dp),

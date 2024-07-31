@@ -11,8 +11,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,7 +40,6 @@ import coil.compose.SubcomposeAsyncImage
 import com.example.sakhcasttv.R
 import com.example.sakhcasttv.model.SeriesCard
 import java.util.Locale
-
 
 @Preview(showBackground = true)
 @Composable
@@ -63,6 +66,11 @@ fun SeriesItemView(
         Color(android.graphics.Color.parseColor(seriesCard.coverColors?.background2 ?: "#000000"))
     val brush = Brush.verticalGradient(listOf(backdropColor1, backdropColor2))
 
+    val viewedSeries = seriesCard.progress?.viewed ?: 0
+    val amountSeries = seriesCard.progress?.amount ?: 100
+    val progress = viewedSeries / amountSeries.toFloat()
+    val newEpisodes = seriesCard.newEpisodes
+
     Card(
         modifier = modifier
             .aspectRatio(250f / 366f),
@@ -77,7 +85,10 @@ fun SeriesItemView(
             ),
         )
     ) {
-        Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
+        Column(
+            modifier = Modifier.background(MaterialTheme.colorScheme.background),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -98,70 +109,99 @@ fun SeriesItemView(
                         )
                     }
                 )
+
                 Row(
                     modifier = Modifier
                         .padding(8.dp)
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .background(
+                                color = Color.Gray.copy(alpha = 0.5f),
+                                shape = RoundedCornerShape(8.dp)
+                            )
                     ) {
-                    if (seriesCard.imdb) {
-                        Box(
-                            modifier = Modifier
-                                .background(
-                                    color = Color.Gray.copy(alpha = 0.8f),
-                                    shape = RoundedCornerShape(8.dp)
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(5.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                        if (seriesCard.imdb) {
+                            Box(
+                                contentAlignment = Alignment.Center
                             ) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.ic_imdb),
-                                    contentDescription = null
-                                )
-                                val formattedRatingImdb =
-                                    String.format(Locale.US, "%.1f", seriesCard.imdbRating)
-                                Text(
-                                    modifier = Modifier.padding(start = 3.dp),
-                                    text = formattedRatingImdb,
-                                    color = Color.White,
-                                    fontSize = 8.sp
-                                )
+                                Row(
+                                    modifier = Modifier.padding(5.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.ic_imdb),
+                                        contentDescription = null
+                                    )
+                                    val formattedRatingImdb =
+                                        String.format(Locale.US, "%.1f", seriesCard.imdbRating)
+                                    Text(
+                                        modifier = Modifier.padding(start = 3.dp),
+                                        text = formattedRatingImdb,
+                                        color = Color.White,
+                                        fontSize = 8.sp
+                                    )
+                                }
+                            }
+                        }
+                        if (seriesCard.kp) {
+                            Box(
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(5.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.ic_kinopoisk),
+                                        contentDescription = null,
+                                    )
+                                    val formattedRatingKp =
+                                        String.format(Locale.US, "%.1f", seriesCard.kpRating)
+                                    Text(
+                                        modifier = Modifier.padding(start = 3.dp),
+                                        text = formattedRatingKp,
+                                        color = Color.White,
+                                        fontSize = 8.sp
+                                    )
+                                }
                             }
                         }
                     }
-                    if (seriesCard.kp) {
+                    if (isFavoriteScreen && newEpisodes != 0) {
                         Box(
                             modifier = Modifier
+                                .size(24.dp)
                                 .background(
-                                    color = Color.Gray.copy(alpha = 0.8f),
-                                    shape = RoundedCornerShape(8.dp)
+                                    color = Color.Red.copy(alpha = 0.8f),
+                                    shape = CircleShape
                                 ),
                             contentAlignment = Alignment.Center
                         ) {
-                            Row(
-                                modifier = Modifier.padding(5.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.ic_kinopoisk),
-                                    contentDescription = null,
-                                )
-                                val formattedRatingKp =
-                                    String.format(Locale.US, "%.1f", seriesCard.kpRating)
-                                Text(
-                                    modifier = Modifier.padding(start = 3.dp),
-                                    text = formattedRatingKp,
-                                    color = Color.White,
-                                    fontSize = 8.sp
-                                )
-                            }
+                            Text(
+                                text = newEpisodes.toString(),
+                                modifier = Modifier,
+                                color = Color.White,
+                                fontSize = 10.sp
+                            )
                         }
                     }
                 }
+
+            }
+            if (isFavoriteScreen) {
+                LinearProgressIndicator(
+                    color = if (progress == 1.0F) Color.Green else Color.Yellow,
+                    trackColor = Color.Black,
+                    progress = { progress },
+                    modifier = Modifier
+                        .padding(top = 3.dp)
+                        .fillMaxWidth(0.95f)
+                        .height(4.dp)
+                        .clip(RoundedCornerShape(10.dp)),
+                )
             }
             Text(
                 text = seriesCard.name,
