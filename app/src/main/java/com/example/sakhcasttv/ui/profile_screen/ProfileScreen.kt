@@ -7,12 +7,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.TextButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,6 +23,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.tv.material3.Button
+import androidx.tv.material3.ButtonDefaults
+import androidx.tv.material3.Icon
+import androidx.tv.material3.IconButton
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import coil.compose.rememberAsyncImagePainter
@@ -30,7 +36,7 @@ import com.example.sakhcasttv.Colors
 import com.example.sakhcasttv.model.CurrentUser
 
 @Composable
-fun ProfileScreen(user: CurrentUser?, onLogoutButtonPushed: () -> Unit) {
+fun ProfileScreen(user: CurrentUser?, onLogoutButtonPushed: () -> Unit, navigateUp: () -> Boolean) {
     val avatarPainter: Painter =
         rememberAsyncImagePainter(
             ImageRequest.Builder(LocalContext.current).data(data = user?.avatar)
@@ -38,22 +44,36 @@ fun ProfileScreen(user: CurrentUser?, onLogoutButtonPushed: () -> Unit) {
                     crossfade(true)
                 }).build()
         )
-//    val profileScreenState = logInScreenViewModel.userDataState.observeAsState(
-//        LogInScreenViewModel.UserDataState()
-//    )
-//    val currentUser = profileScreenState.value.currentUser
-//
-//    LaunchedEffect(Unit) {
-//        logInScreenViewModel.checkLoggedUser()
-//    }
 
-    Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .padding(top = 40.dp)
+    ) {
         Box(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.CenterEnd
         ) {
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                 Text(text = "Учетная запись")
+            }
+        }
+        Box(
+            modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
+            contentAlignment = Alignment.CenterEnd
+        ) {
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
+                IconButton(
+                    onClick = { navigateUp() },
+                    modifier = Modifier.padding(start = 16.dp, top = 16.dp),
+                    colors = ButtonDefaults.colors(focusedContainerColor = MaterialTheme.colorScheme.onTertiaryContainer)
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = null
+                    )
+                }
             }
         }
         Spacer(modifier = Modifier.height(30.dp))
@@ -102,18 +122,17 @@ fun ProfileScreen(user: CurrentUser?, onLogoutButtonPushed: () -> Unit) {
             modifier = Modifier.padding(horizontal = 16.dp)
         )
 
-        TextButton(
-            onClick = {
-                onLogoutButtonPushed()
-            }, modifier = Modifier
+        Button(
+            colors = ButtonDefaults.colors(focusedContainerColor = MaterialTheme.colorScheme.onTertiaryContainer),
+            onClick = { onLogoutButtonPushed() },
+            modifier = Modifier
                 .padding(16.dp)
                 .clip(MaterialTheme.shapes.small)
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.inverseOnSurface)
+                .fillMaxWidth(),
         ) {
-            Text(text = "Выйти из аккаунта", color = Colors.blueColor)
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                Text(text = "Выйти из аккаунта", color = Colors.blueColor)
+            }
         }
-        Spacer(modifier = Modifier.height(200.dp))
     }
-
 }

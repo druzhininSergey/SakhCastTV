@@ -59,7 +59,8 @@ fun SeriesPage(
                             SeriesItemView(
                                 seriesCard = series,
                                 navigateToSeriesById = navigateToSeriesById,
-                                modifier = Modifier.width(150.dp)
+                                modifier = Modifier.width(150.dp),
+                                isFavoriteScreen = true,
                             )
                         }
                     }

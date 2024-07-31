@@ -1,6 +1,5 @@
 package com.example.sakhcasttv.ui.movie_series_view
 
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -94,7 +93,6 @@ fun SeriesView(
     val imageUrl = series?.backdropAlt + ".webp"
     val bringIntoViewRequester = remember { BringIntoViewRequester() }
     val coroutineScope = rememberCoroutineScope()
-    Log.i("!!!", "SeriesView favKind = ${series?.userFavoriteInSeries?.kind}")
 
     LazyColumn(modifier = Modifier.background(MaterialTheme.colorScheme.surface)) {
         item {

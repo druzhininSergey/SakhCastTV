@@ -13,6 +13,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.sakhcasttv.MOVIE_CATEGORY_SCREEN
 import com.example.sakhcasttv.MOVIE_VIEW
 import com.example.sakhcasttv.PLAYER
+import com.example.sakhcasttv.PROFILE_SCREEN
 import com.example.sakhcasttv.SERIES_CATEGORY_SCREEN
 import com.example.sakhcasttv.SERIES_PLAYER
 import com.example.sakhcasttv.SERIES_VIEW
@@ -68,6 +69,7 @@ fun AuthenticatedMainScreen(
                 currentDestination != "$MOVIE_VIEW/{movieId}" &&
                 currentDestination != "$SERIES_VIEW/{seriesId}" &&
                 currentDestination != "$PLAYER/{hls}/{title}/{position}/{movieAlphaId}" &&
+                currentDestination != PROFILE_SCREEN &&
                 currentDestination != "$SERIES_PLAYER/{seasonId}/{seriesTitle}/{episodeChosenIndex}/{rgChosen}"
     }
 

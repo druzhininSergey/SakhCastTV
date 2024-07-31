@@ -1,6 +1,5 @@
 package com.example.sakhcasttv.ui.main_screens.favorites_screen
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.width
@@ -52,7 +51,6 @@ fun MovieSection(
     navigateToMovieByAlphaId: (String) -> Unit,
     navigateToMovieCategoriesByGenresId: (String, String) -> Unit
 ) {
-    Log.i("!!!", "categoryNames = $categoryNames")
     CustomListItem(
         category = categoryNames,
         isSeries = false,

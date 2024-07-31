@@ -46,6 +46,7 @@ fun AuthNavGraph(
     onLogoutButtonPushed: () -> Unit,
     mainScreensViewModel: MainScreensViewModel = hiltViewModel()
 ) {
+    val navigateUp = { navHostController.navigateUp() }
     val navigate = { route: String -> navHostController.navigate(route) }
 
     val navigateToMovieByAlphaId = { movieAlphaId: String -> navigate("$MOVIE_VIEW/$movieAlphaId") }
@@ -135,7 +136,7 @@ fun AuthNavGraph(
             )
         }
         composable(PROFILE_SCREEN) {
-            ProfileScreen(user = user, onLogoutButtonPushed = onLogoutButtonPushed)
+            ProfileScreen(user = user, onLogoutButtonPushed = onLogoutButtonPushed, navigateUp = navigateUp)
         }
         composable("$MOVIE_VIEW/{movieId}") { backStackEntry ->
             val alphaId = backStackEntry.arguments?.getString("movieId")
