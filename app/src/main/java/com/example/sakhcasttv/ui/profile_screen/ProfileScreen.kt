@@ -82,7 +82,7 @@ fun ProfileScreen(user: CurrentUser?, onLogoutButtonPushed: () -> Unit) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     if (user != null) {
-                        Text(text = user.login ?: "")
+                        Text(text = user.login)
                         Spacer(modifier = Modifier.height(15.dp))
                         Text(
                             text = user.proDays.toString() + "дн.",

@@ -7,7 +7,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextMotion
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.ShapeDefaults
 import androidx.tv.material3.Typography
 import com.example.sakhcasttv.R
@@ -159,6 +158,7 @@ val JetStreamCardShape = ShapeDefaults.ExtraSmall
 val JetStreamButtonShape = ShapeDefaults.ExtraSmall
 val IconSize = 20.dp
 val JetStreamBorderWidth = 3.dp
+
 /**
  * Space to be given below every Lazy (or scrollable) vertical list throughout the app
  */

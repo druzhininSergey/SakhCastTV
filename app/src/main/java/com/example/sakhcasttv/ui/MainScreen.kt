@@ -10,8 +10,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.sakhcasttv.MOVIE_CATEGORY_SCREEN
 import com.example.sakhcasttv.MOVIE_VIEW
 import com.example.sakhcasttv.PLAYER
+import com.example.sakhcasttv.SERIES_CATEGORY_SCREEN
 import com.example.sakhcasttv.SERIES_PLAYER
 import com.example.sakhcasttv.SERIES_VIEW
 import com.example.sakhcasttv.model.CurrentUser
@@ -61,7 +63,9 @@ fun AuthenticatedMainScreen(
 //                currentDestination != "$SERIES_PLAYER/{seasonId}/{seriesTitle}/{episodeChosenIndex}/{rgChosen}"
 //    }
     val isTopBarVisible = remember(key1 = backStackState) {
-        currentDestination != "$MOVIE_VIEW/{movieId}" &&
+        currentDestination != "$SERIES_CATEGORY_SCREEN/{category}/{name}" &&
+                currentDestination != "$MOVIE_CATEGORY_SCREEN/{category}/{genresId}" &&
+                currentDestination != "$MOVIE_VIEW/{movieId}" &&
                 currentDestination != "$SERIES_VIEW/{seriesId}" &&
                 currentDestination != "$PLAYER/{hls}/{title}/{position}/{movieAlphaId}" &&
                 currentDestination != "$SERIES_PLAYER/{seasonId}/{seriesTitle}/{episodeChosenIndex}/{rgChosen}"
