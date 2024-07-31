@@ -52,6 +52,7 @@ fun SeriesItemView(
     seriesCard: SeriesCard,
     navigateToSeriesById: (String) -> Unit,
     modifier: Modifier = Modifier,
+    isFavoriteScreen: Boolean = false,
 ) {
     val imageUrl = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) seriesCard.coverAlt + ".avif"
     else seriesCard.coverAlt + ".webp"

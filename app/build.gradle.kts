@@ -6,6 +6,7 @@ plugins {
     kotlin("plugin.serialization")
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.google.firebase.crashlytics)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -39,12 +40,6 @@ android {
     }
     kotlinOptions {
         jvmTarget = "1.8"
-    }
-    buildFeatures {
-        compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
     }
     packaging {
         resources {
@@ -115,6 +110,9 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.activity.compose)
+
+    //runtime-compose
+    implementation(libs.androidx.lifecycle.runtime.compose)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

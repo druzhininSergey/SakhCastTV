@@ -1,5 +1,6 @@
 package com.example.sakhcasttv.ui
 
+import android.net.Uri
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.PaddingValues
@@ -24,6 +25,8 @@ import com.example.sakhcasttv.SERIES_CATEGORY_SCREEN
 import com.example.sakhcasttv.SERIES_PLAYER
 import com.example.sakhcasttv.SERIES_VIEW
 import com.example.sakhcasttv.model.CurrentUser
+import com.example.sakhcasttv.ui.category_screens.MovieCategoryScreen
+import com.example.sakhcasttv.ui.category_screens.SeriesCategoryScreen
 import com.example.sakhcasttv.ui.main_screens.MainScreensViewModel
 import com.example.sakhcasttv.ui.main_screens.catalog_screen.CatalogScreen
 import com.example.sakhcasttv.ui.main_screens.favorites_screen.FavoritesScreen
@@ -43,7 +46,6 @@ fun AuthNavGraph(
     onLogoutButtonPushed: () -> Unit,
     mainScreensViewModel: MainScreensViewModel = hiltViewModel()
 ) {
-    val navigateUp = { navHostController.navigateUp() }
     val navigate = { route: String -> navHostController.navigate(route) }
 
     val navigateToMovieByAlphaId = { movieAlphaId: String -> navigate("$MOVIE_VIEW/$movieAlphaId") }
@@ -154,29 +156,27 @@ fun AuthNavGraph(
                 navigateToSeriesPlayer = navigateToSeriesPlayer
             )
         }
-//        composable("$MOVIE_CATEGORY_SCREEN/{category}/{genresId}") { backStackEntry ->
-//            val searchCategoryNameUri = backStackEntry.arguments?.getString("category") ?: "Все"
-//            val searchCategoryName = Uri.decode(searchCategoryNameUri)
-//            val searchGenreId = backStackEntry.arguments?.getString("genresId")
-//            MovieCategoryScreen(
-//                paddingValues = paddingValues,
-//                searchCategoryName = searchCategoryName,
-//                searchGenreId = searchGenreId,
-//                navigateUp = navigateUp,
-//                navigateToMovieByAlphaId = navigateToMovieByAlphaId
-//            )
-//        }
-//        composable("$SERIES_CATEGORY_SCREEN/{category}/{name}") { backStackEntry ->
-//            val categoryName = backStackEntry.arguments?.getString("category") ?: "Все"
-//            val name = backStackEntry.arguments?.getString("name") ?: ""
-//            SeriesCategoryScreen(
-//                paddingValues = paddingValues,
-//                categoryName = categoryName,
-//                name = name,
-//                navigateUp = navigateUp,
-//                navigateToSeriesById = navigateToSeriesById,
-//            )
-//        }
+        composable("$MOVIE_CATEGORY_SCREEN/{category}/{genresId}") { backStackEntry ->
+            val searchCategoryNameUri = backStackEntry.arguments?.getString("category") ?: "Все"
+            val searchCategoryName = Uri.decode(searchCategoryNameUri)
+            val searchGenreId = backStackEntry.arguments?.getString("genresId")
+            MovieCategoryScreen(
+                paddingValues = paddingValues,
+                searchCategoryName = searchCategoryName,
+                searchGenreId = searchGenreId,
+                navigateToMovieByAlphaId = navigateToMovieByAlphaId
+            )
+        }
+        composable("$SERIES_CATEGORY_SCREEN/{category}/{name}") { backStackEntry ->
+            val categoryName = backStackEntry.arguments?.getString("category") ?: "Все"
+            val name = backStackEntry.arguments?.getString("name") ?: ""
+            SeriesCategoryScreen(
+                paddingValues = paddingValues,
+                categoryName = categoryName,
+                name = name,
+                navigateToSeriesById = navigateToSeriesById,
+            )
+        }
 //        composable("$PLAYER/{hls}/{title}/{position}/{movieAlphaId}") { backStackEntry ->
 //            val hls = backStackEntry.arguments?.getString("hls") ?: ""
 //            val title = backStackEntry.arguments?.getString("title") ?: ""

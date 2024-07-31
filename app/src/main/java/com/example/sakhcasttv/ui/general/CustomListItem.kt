@@ -39,7 +39,7 @@ fun CustomListItem(
                     )
                 }
             else onClick ?: onClickWithParam?.let {
-                it("category?.value", category?.key ?: "")
+                it(category?.key ?: "", category?.value ?: "")
             }
         },
         headlineContent = {
