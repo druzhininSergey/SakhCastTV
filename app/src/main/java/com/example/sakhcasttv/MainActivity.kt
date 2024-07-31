@@ -9,6 +9,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.tv.material3.Surface
 import com.example.sakhcasttv.data.registerOnBackPress
 import com.example.sakhcasttv.ui.MainScreen
@@ -20,6 +21,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        installSplashScreen()
         setContent {
             val displayDialog = remember {
                 mutableStateOf(false)
