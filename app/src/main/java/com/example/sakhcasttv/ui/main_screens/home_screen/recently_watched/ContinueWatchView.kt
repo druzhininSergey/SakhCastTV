@@ -1,6 +1,5 @@
 package com.example.sakhcasttv.ui.main_screens.home_screen.recently_watched
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import com.example.sakhcasttv.model.MovieRecent
 import com.example.sakhcasttv.model.SeriesRecent
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ContinueWatchView(
     movie: MovieRecent,
@@ -41,7 +39,9 @@ fun ContinueWatchView(
         tabIndex = pagerState.currentPage
     }
     Box(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 16.dp),
         contentAlignment = Alignment.Center,
     ) {
         Row {

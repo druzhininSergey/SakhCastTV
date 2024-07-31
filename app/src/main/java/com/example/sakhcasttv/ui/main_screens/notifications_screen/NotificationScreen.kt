@@ -15,7 +15,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Icon
 import androidx.tv.material3.ListItem
@@ -24,16 +23,6 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.example.sakhcasttv.CustomListItemColors
 import com.example.sakhcasttv.Dimens
-
-
-@Preview
-@Composable
-fun PreviewNotificationScreen() {
-//    NotificationScreen(
-//        paddingValues = PaddingValues(20.dp),
-//        notificationScreenState = notificationScreenState
-//    )
-}
 
 @Composable
 fun NotificationScreen(
