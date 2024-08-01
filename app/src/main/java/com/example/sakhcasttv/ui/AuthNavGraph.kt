@@ -34,6 +34,8 @@ import com.example.sakhcasttv.ui.main_screens.home_screen.HomeScreen
 import com.example.sakhcasttv.ui.main_screens.notifications_screen.NotificationScreen
 import com.example.sakhcasttv.ui.main_screens.notifications_screen.NotificationScreenViewModel
 import com.example.sakhcasttv.ui.main_screens.search_screen.SearchScreen
+import com.example.sakhcasttv.ui.movie_player.MoviePlayer
+import com.example.sakhcasttv.ui.movie_player.VideoPlayerScreen
 import com.example.sakhcasttv.ui.movie_series_view.MovieView
 import com.example.sakhcasttv.ui.movie_series_view.SeriesView
 import com.example.sakhcasttv.ui.profile_screen.ProfileScreen
@@ -59,7 +61,7 @@ fun AuthNavGraph(
         { categoryName: String -> navigate("$MOVIE_CATEGORY_SCREEN/$categoryName/{}") }
     val navigateToMoviePlayer =
         { hlsToSend: String, titleToSend: String, positionToSend: Int, alphaIdToSend: String ->
-            navigate("$PLAYER/$hlsToSend/$titleToSend/$positionToSend/$alphaIdToSend")
+            navigate("test$PLAYER/$hlsToSend/$titleToSend/$positionToSend/$alphaIdToSend")
         }
     val navigateToMovieCategoriesByGenresId = { genresName: String, genresId: String ->
         navigate("$MOVIE_CATEGORY_SCREEN/$genresName/$genresId")
@@ -136,7 +138,11 @@ fun AuthNavGraph(
             )
         }
         composable(PROFILE_SCREEN) {
-            ProfileScreen(user = user, onLogoutButtonPushed = onLogoutButtonPushed, navigateUp = navigateUp)
+            ProfileScreen(
+                user = user,
+                onLogoutButtonPushed = onLogoutButtonPushed,
+                navigateUp = navigateUp
+            )
         }
         composable("$MOVIE_VIEW/{movieId}") { backStackEntry ->
             val alphaId = backStackEntry.arguments?.getString("movieId")
@@ -178,20 +184,34 @@ fun AuthNavGraph(
                 navigateToSeriesById = navigateToSeriesById,
             )
         }
-//        composable("$PLAYER/{hls}/{title}/{position}/{movieAlphaId}") { backStackEntry ->
-//            val hls = backStackEntry.arguments?.getString("hls") ?: ""
-//            val title = backStackEntry.arguments?.getString("title") ?: ""
-//            val positionStr = backStackEntry.arguments?.getString("position") ?: "0"
-//            val position = positionStr.toInt()
-//            val movieAlphaId = backStackEntry.arguments?.getString("movieAlphaId") ?: ""
-//            Player2(
-//                hls = hls,
-//                title = title,
-//                position = position,
-//                movieAlphaId = movieAlphaId,
-//                navigateUp = navigateUp
-//            )
-//        }
+        composable("$PLAYER/{hls}/{title}/{position}/{movieAlphaId}") { backStackEntry ->
+            val hls = backStackEntry.arguments?.getString("hls") ?: ""
+            val title = backStackEntry.arguments?.getString("title") ?: ""
+            val positionStr = backStackEntry.arguments?.getString("position") ?: "0"
+            val position = positionStr.toInt()
+            val movieAlphaId = backStackEntry.arguments?.getString("movieAlphaId") ?: ""
+            MoviePlayer(
+                hls = hls,
+                title = title,
+                position = position,
+                movieAlphaId = movieAlphaId,
+            )
+        }
+        //TODO Удалить потом ниже
+        composable("test$PLAYER/{hls}/{title}/{position}/{movieAlphaId}") { backStackEntry ->
+            val hls = backStackEntry.arguments?.getString("hls") ?: ""
+            val title = backStackEntry.arguments?.getString("title") ?: ""
+            val positionStr = backStackEntry.arguments?.getString("position") ?: "0"
+            val position = positionStr.toInt()
+            val movieAlphaId = backStackEntry.arguments?.getString("movieAlphaId") ?: ""
+            VideoPlayerScreen(
+                hls = hls,
+                title = title,
+                position = position,
+                movieAlphaId = movieAlphaId,
+                onBackPressed = { navigateUp() },
+            )
+        }
 //        composable("$SERIES_PLAYER/{seasonId}/{seriesTitle}/{episodeChosenIndex}/{rgChosen}") { backStackEntry ->
 //            val seasonId = backStackEntry.arguments?.getString("seasonId") ?: ""
 //            val seriesTitle = backStackEntry.arguments?.getString("seriesTitle") ?: ""

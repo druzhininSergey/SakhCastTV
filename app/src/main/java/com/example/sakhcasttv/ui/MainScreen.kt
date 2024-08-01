@@ -70,6 +70,7 @@ fun AuthenticatedMainScreen(
                 currentDestination != "$SERIES_VIEW/{seriesId}" &&
                 currentDestination != "$PLAYER/{hls}/{title}/{position}/{movieAlphaId}" &&
                 currentDestination != PROFILE_SCREEN &&
+                currentDestination != "test$PLAYER/{hls}/{title}/{position}/{movieAlphaId}" &&
                 currentDestination != "$SERIES_PLAYER/{seasonId}/{seriesTitle}/{episodeChosenIndex}/{rgChosen}"
     }
 
