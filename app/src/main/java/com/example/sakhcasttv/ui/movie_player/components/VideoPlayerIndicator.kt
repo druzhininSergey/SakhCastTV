@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -38,9 +39,9 @@ fun RowScope.VideoPlayerControllerIndicator(
         else MaterialTheme.colorScheme.onSurface
     )
     val animatedIndicatorHeight by animateDpAsState(
-        targetValue = 4.dp.times((if (isFocused) 2.5f else 1f))
+        targetValue = 4.dp.times((if (isFocused) 2.5f else 1f)), label = ""
     )
-    var seekProgress by remember { mutableStateOf(0f) }
+    var seekProgress by remember { mutableFloatStateOf(0f) }
     val focusManager = LocalFocusManager.current
 
     LaunchedEffect(isSelected) {

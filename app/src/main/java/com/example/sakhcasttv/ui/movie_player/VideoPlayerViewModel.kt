@@ -1,14 +1,14 @@
 package com.example.sakhcasttv.ui.movie_player
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
-import androidx.media3.common.Player
+import androidx.media3.exoplayer.ExoPlayer
 import com.example.sakhcasttv.data.repository.SakhCastRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -16,7 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class VideoPlayerViewModel @Inject constructor(
     private val sakhCastRepository: SakhCastRepository,
-    val player: Player,
+    val player: ExoPlayer,
 ) : ViewModel() {
 
     private var _movieWatchState = MutableStateFlow(MovieWatchState())
@@ -24,6 +24,9 @@ class VideoPlayerViewModel @Inject constructor(
 
     private var _isPlayerPlaying = MutableStateFlow(player.isPlaying)
     val isPlayerPlaying = _isPlayerPlaying.asStateFlow()
+
+    private var _contentCurrentPosition = MutableStateFlow(player.currentPosition)
+    val contentCurrentPosition = _contentCurrentPosition.asStateFlow()
 
     private var _isPositionSending = MutableStateFlow(false)
     private val isPositionSending = _isPositionSending.asStateFlow()
@@ -34,6 +37,12 @@ class VideoPlayerViewModel @Inject constructor(
         var position: Int = 0,
         var movieAlphaId: String = "",
     )
+
+    fun preparePlayer(hlsUrl: String) {
+        val mediaItem = MediaItem.fromUri(hlsUrl)
+        player.setMediaItem(mediaItem)
+        player.prepare()
+    }
 
     fun startPlayer() {
         if (!isPositionSending.value) {
@@ -51,21 +60,25 @@ class VideoPlayerViewModel @Inject constructor(
         }
     }
 
-    fun onPlayPausePressed (){
+    fun onPlayPauseToggle() {
         if (!isPlayerPlaying.value) player.play()
         else player.pause()
     }
 
-    fun seekTo(position: Long){
-        player.seekTo(position)
+    fun onSeek(seekProgress: Float) {
+        player.seekTo(player.duration.times(seekProgress).toLong())
     }
 
-    fun seekForward(){
+    fun seekForward() {
         player.seekForward()
     }
 
-    fun seekBack(){
+    fun seekBack() {
         player.seekBack()
+    }
+
+    fun releasePlayer() {
+        player.release()
     }
 
     fun setMovieData(hlsUri: String, title: String, position: Int, movieAlphaId: String) {
@@ -100,6 +113,7 @@ class VideoPlayerViewModel @Inject constructor(
         super.onCleared()
         _isPositionSending.value = false
         player.release()
+        Log.i("!!!", "player.release() ViewModel")
     }
 
 }

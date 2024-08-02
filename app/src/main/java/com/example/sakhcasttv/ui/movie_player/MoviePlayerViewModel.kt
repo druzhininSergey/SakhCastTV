@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.exoplayer.ExoPlayer
 import com.example.sakhcasttv.data.repository.SakhCastRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -16,7 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MoviePlayerViewModel @Inject constructor(
     private val sakhCastRepository: SakhCastRepository,
-    val player: Player,
+    val player: ExoPlayer,
 ) : ViewModel() {
 
     private val _movieWatchState = MutableStateFlow(MovieWatchState())

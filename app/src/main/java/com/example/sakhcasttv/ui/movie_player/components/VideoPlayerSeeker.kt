@@ -19,7 +19,7 @@ fun VideoPlayerSeeker(
     focusRequester: FocusRequester,
     state: VideoPlayerState,
     isPlaying: Boolean,
-    onPlayPauseToggle: (Boolean) -> Unit,
+    onPlayPauseToggle: () -> Unit,
     onSeek: (Float) -> Unit,
     contentProgress: Duration,
     contentDuration: Duration
@@ -47,7 +47,7 @@ fun VideoPlayerSeeker(
         VideoPlayerControlsIcon(
             modifier = Modifier.focusRequester(focusRequester),
             icon = if (!isPlaying) Icons.Default.PlayArrow else ImageVector.vectorResource(id = R.drawable.ic_pause),
-            onClick = { onPlayPauseToggle(!isPlaying) },
+            onClick = { onPlayPauseToggle() },
             state = state,
             isPlaying = isPlaying,
             contentDescription = StringConstants
