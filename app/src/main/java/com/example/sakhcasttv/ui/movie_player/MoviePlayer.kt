@@ -44,6 +44,7 @@ import androidx.media3.ui.PlayerView
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Surface
+import androidx.tv.material3.SurfaceDefaults
 import androidx.tv.material3.Text
 import com.example.sakhcasttv.R
 import com.example.sakhcasttv.ui.movie_player.components.VideoPlayerControlsIcon
@@ -54,6 +55,7 @@ import com.example.sakhcasttv.ui.movie_player.components.VideoPlayerPulse
 import com.example.sakhcasttv.ui.movie_player.components.VideoPlayerSeeker
 import com.example.sakhcasttv.ui.movie_player.components.rememberVideoPlayerPulseState
 import com.example.sakhcasttv.ui.movie_player.components.rememberVideoPlayerState
+import kotlinx.coroutines.delay
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
@@ -91,6 +93,11 @@ fun MoviePlayer(
     val availableAudioTracks by playerViewModel.availableAudioTracks.collectAsStateWithLifecycle()
     val currentAudioTrack by playerViewModel.currentAudioTrack.collectAsStateWithLifecycle()
     var showAudioTrackDialog by remember { mutableStateOf(false) }
+
+    val currentResizeModeIndex by playerViewModel.currentResizeModeIndex.collectAsStateWithLifecycle()
+    val currentResizeModeName by playerViewModel.currentResizeModeName.collectAsStateWithLifecycle()
+    var showResizeModeMessage by remember { mutableStateOf(false) }
+
 
     LaunchedEffect(hls) {
         playerViewModel.setHlsManifest(hls)
@@ -146,7 +153,11 @@ fun MoviePlayer(
                         ViewGroup.LayoutParams.MATCH_PARENT
                     )
                     setBackgroundColor(0xFF000000.toInt())
+                    resizeMode = playerViewModel.resizeModes[currentResizeModeIndex]
                 }
+            },
+            update = { playerView ->
+                playerView.resizeMode = playerViewModel.resizeModes[currentResizeModeIndex]
             }
         )
 
@@ -161,6 +172,17 @@ fun MoviePlayer(
                 VideoPlayerMainFrame(
                     mediaActions = {
                         Row {
+                            VideoPlayerControlsIcon(
+                                icon = ImageVector.vectorResource(id = R.drawable.ic_aspect_ratio),
+                                contentDescription = "Режим растягивания",
+                                onClick = {
+                                    playerViewModel.toggleResizeMode()
+                                    showResizeModeMessage = true
+                                },
+                                state = playerState,
+                                isPlaying = isPlaying
+                            )
+
                             VideoPlayerControlsIcon(
                                 icon = ImageVector.vectorResource(id = R.drawable.ic_cc),
                                 contentDescription = "Субтитры",
@@ -212,6 +234,33 @@ fun MoviePlayer(
                 )
             }
         )
+        if (showResizeModeMessage) {
+            LaunchedEffect(currentResizeModeName) {
+                delay(2000)
+                showResizeModeMessage = false
+            }
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Surface(
+                    modifier = Modifier
+                        .padding(16.dp),
+                    shape = MaterialTheme.shapes.medium,
+                    colors = SurfaceDefaults.colors(
+                        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.3f),
+                        contentColor = MaterialTheme.colorScheme.onSurface
+                    )
+                ) {
+                    Text(
+                        text = currentResizeModeName,
+                        modifier = Modifier
+                            .padding(16.dp),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            }
+        }
         if (showQualityDialog) {
             QualitySelectionDialog(
                 qualities = availableQualities,
@@ -248,6 +297,7 @@ fun MoviePlayer(
     }
 }
 
+@OptIn(UnstableApi::class)
 @Composable
 fun AudioTrackSelectionDialog(
     audioTracks: List<MoviePlayerViewModel.AudioTrackReceived>,
@@ -287,6 +337,7 @@ fun AudioTrackSelectionDialog(
     }
 }
 
+@OptIn(UnstableApi::class)
 @Composable
 fun QualitySelectionDialog(
     qualities: List<MoviePlayerViewModel.VideoQuality>,
@@ -326,6 +377,7 @@ fun QualitySelectionDialog(
     }
 }
 
+@OptIn(UnstableApi::class)
 @Composable
 fun SubtitleSelectionDialog(
     subtitles: List<MoviePlayerViewModel.Subtitle>,

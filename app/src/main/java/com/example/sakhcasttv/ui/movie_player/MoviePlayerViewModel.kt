@@ -11,6 +11,7 @@ import androidx.media3.common.Tracks
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import androidx.media3.ui.AspectRatioFrameLayout
 import com.example.sakhcasttv.data.repository.SakhCastRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -22,11 +23,20 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@UnstableApi
 @HiltViewModel
 class MoviePlayerViewModel @Inject constructor(
     private val sakhCastRepository: SakhCastRepository,
     val player: Player,
 ) : ViewModel() {
+
+    val resizeModes = listOf(
+        AspectRatioFrameLayout.RESIZE_MODE_FIT,
+        AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH,
+        AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT,
+        AspectRatioFrameLayout.RESIZE_MODE_FILL,
+        AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+    )
 
     private val _movieWatchState = MutableStateFlow(MovieWatchState())
     val movieWatchState: StateFlow<MovieWatchState> = _movieWatchState.asStateFlow()
@@ -60,6 +70,12 @@ class MoviePlayerViewModel @Inject constructor(
 
     private val _currentAudioTrack = MutableStateFlow<AudioTrackReceived?>(null)
     val currentAudioTrack: StateFlow<AudioTrackReceived?> = _currentAudioTrack.asStateFlow()
+
+    private val _currentResizeModeIndex = MutableStateFlow(0)
+    val currentResizeModeIndex: StateFlow<Int> = _currentResizeModeIndex.asStateFlow()
+
+    private val _currentResizeModeName = MutableStateFlow("Подогнать")
+    val currentResizeModeName: StateFlow<String> = _currentResizeModeName.asStateFlow()
 
     private var baseUrl: String = ""
 
@@ -115,6 +131,22 @@ class MoviePlayerViewModel @Inject constructor(
     init {
         player.addListener(playerListener)
         startPositionUpdates()
+    }
+
+    fun toggleResizeMode() {
+        _currentResizeModeIndex.value = (_currentResizeModeIndex.value + 1) % resizeModes.size
+        updateResizeModeName()
+    }
+
+    private fun updateResizeModeName() {
+        _currentResizeModeName.value = when (resizeModes[_currentResizeModeIndex.value]) {
+            AspectRatioFrameLayout.RESIZE_MODE_FIT -> "Оптимальный"
+            AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH -> "По ширине"
+            AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT -> "По высоте"
+            AspectRatioFrameLayout.RESIZE_MODE_FILL -> "Заполнение"
+            AspectRatioFrameLayout.RESIZE_MODE_ZOOM -> "Увеличение"
+            else -> "Неизвестно"
+        }
     }
 
     private fun updateAvailableAudioTracks() {
