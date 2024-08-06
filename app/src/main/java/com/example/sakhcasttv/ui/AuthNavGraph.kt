@@ -35,10 +35,10 @@ import com.example.sakhcasttv.ui.main_screens.notifications_screen.NotificationS
 import com.example.sakhcasttv.ui.main_screens.notifications_screen.NotificationScreenViewModel
 import com.example.sakhcasttv.ui.main_screens.search_screen.SearchScreen
 import com.example.sakhcasttv.ui.movie_player.MoviePlayer
-import com.example.sakhcasttv.ui.movie_player.VideoPlayerScreen
 import com.example.sakhcasttv.ui.movie_series_view.MovieView
 import com.example.sakhcasttv.ui.movie_series_view.SeriesView
 import com.example.sakhcasttv.ui.profile_screen.ProfileScreen
+import com.example.sakhcasttv.ui.test_player.PlayerScreen
 
 @Composable
 fun AuthNavGraph(
@@ -61,7 +61,7 @@ fun AuthNavGraph(
         { categoryName: String -> navigate("$MOVIE_CATEGORY_SCREEN/$categoryName/{}") }
     val navigateToMoviePlayer =
         { hlsToSend: String, titleToSend: String, positionToSend: Int, alphaIdToSend: String ->
-            navigate("test$PLAYER/$hlsToSend/$titleToSend/$positionToSend/$alphaIdToSend")
+            navigate("$PLAYER/$hlsToSend/$titleToSend/$positionToSend/$alphaIdToSend")
         }
     val navigateToMovieCategoriesByGenresId = { genresName: String, genresId: String ->
         navigate("$MOVIE_CATEGORY_SCREEN/$genresName/$genresId")
@@ -204,11 +204,15 @@ fun AuthNavGraph(
             val positionStr = backStackEntry.arguments?.getString("position") ?: "0"
             val position = positionStr.toInt()
             val movieAlphaId = backStackEntry.arguments?.getString("movieAlphaId") ?: ""
-            VideoPlayerScreen(
-                hls = hls,
-                title = title,
-                position = position,
-                movieAlphaId = movieAlphaId,
+//            VideoPlayerScreen(
+//                hls = hls,
+//                title = title,
+//                position = position,
+//                movieAlphaId = movieAlphaId,
+//                onBackPressed = { navigateUp() },
+//            )
+            PlayerScreen(
+                mediaUrl = hls,
                 onBackPressed = { navigateUp() },
             )
         }

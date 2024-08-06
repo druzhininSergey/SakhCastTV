@@ -14,7 +14,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -26,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.common.Player
 import androidx.media3.ui.PlayerView
 import com.example.sakhcasttv.R
 import com.example.sakhcasttv.ui.general.StringConstants
@@ -42,6 +45,7 @@ import com.example.sakhcasttv.ui.movie_player.components.VideoPlayerSeeker
 import com.example.sakhcasttv.ui.movie_player.components.VideoPlayerState
 import com.example.sakhcasttv.ui.movie_player.components.rememberVideoPlayerPulseState
 import com.example.sakhcasttv.ui.movie_player.components.rememberVideoPlayerState
+import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
@@ -54,34 +58,34 @@ fun VideoPlayerScreen(
     videoPlayerViewModel: VideoPlayerViewModel = hiltViewModel()
 ) {
     val movieWatchState = videoPlayerViewModel.movieWatchState.collectAsStateWithLifecycle()
-    val isPlayerPlaying by videoPlayerViewModel.isPlayerPlaying.collectAsStateWithLifecycle()
-    val contentCurrentPosition by videoPlayerViewModel.contentCurrentPosition.collectAsStateWithLifecycle()
+//    val isPlayerPlaying by videoPlayerViewModel.isPlayerPlaying.collectAsStateWithLifecycle()
+//    val contentCurrentPosition by videoPlayerViewModel.contentCurrentPosition.collectAsStateWithLifecycle()
 
     LaunchedEffect(hls) {
         videoPlayerViewModel.preparePlayer(hls)
     }
 
-    DisposableEffect(Unit) {
-        onDispose {
-            videoPlayerViewModel.releasePlayer()
-            Log.i("!!!", "videoPlayerViewModel.releasePlayer() in VIEW")
-        }
-    }
+//    DisposableEffect(Unit) {
+//        onDispose {
+//            videoPlayerViewModel.releasePlayer()
+//            Log.i("!!!", "videoPlayerViewModel.releasePlayer() in VIEW")
+//        }
+//    }
 
     VideoPlayerScreenContent(
         hls = hls,
         title = title,
         position = position,
         movieAlphaId = movieAlphaId,
-        isPlaying = isPlayerPlaying,
-        contentCurrentPosition = contentCurrentPosition,
+//        isPlaying = isPlayerPlaying,
+//        contentCurrentPosition = contentCurrentPosition,
         player = videoPlayerViewModel.player,
 
         onBackPressed = onBackPressed,
         onPlayPauseToggle = videoPlayerViewModel::onPlayPauseToggle,
         onSeek = videoPlayerViewModel::onSeek,
 
-    )
+        )
 }
 
 @Composable
@@ -90,15 +94,15 @@ fun VideoPlayerScreenContent(
     title: String,
     position: Int,
     movieAlphaId: String,
-    isPlaying: Boolean,
-    contentCurrentPosition: Long,
-    player: ExoPlayer,
+//    isPlaying: Boolean,
+//    contentCurrentPosition: Long,
+    player: Player,
 
     onBackPressed: () -> Unit,
     onPlayPauseToggle: () -> Unit,
     onSeek: (Float) -> Unit,
 
-) {
+    ) {
     val context = LocalContext.current
     val videoPlayerState = rememberVideoPlayerState(hideSeconds = 4)
     Log.i("!!!", "hls = $hls")
@@ -113,15 +117,19 @@ fun VideoPlayerScreenContent(
 
 // TODO: Если стейты в ViewModel не будут отрабатывать вернуть во view как было
 
-//    var contentCurrentPosition by remember { mutableLongStateOf(0L) }
-//    var isPlaying: Boolean by remember { mutableStateOf(exoPlayer.isPlaying) }
-//    LaunchedEffect(Unit) {
-//        while (true) {
-//            delay(300)
-//            contentCurrentPosition = exoPlayer.currentPosition
-//            isPlaying = exoPlayer.isPlaying
-//        }
-//    }
+    DisposableEffect(Unit) {
+        onDispose { player.release() }
+    }
+
+    var contentCurrentPosition by remember { mutableLongStateOf(0L) }
+    var isPlaying: Boolean by remember { mutableStateOf(player.isPlaying) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(300)
+            contentCurrentPosition = player.currentPosition
+            isPlaying = player.isPlaying
+        }
+    }
 
     BackHandler(onBack = onBackPressed)
 
@@ -165,7 +173,7 @@ fun VideoPlayerScreenContent(
                     onPlayPauseToggle = onPlayPauseToggle,
                     onSeek = onSeek,
 
-                )
+                    )
             }
         )
     }
@@ -175,7 +183,7 @@ fun VideoPlayerScreenContent(
 fun VideoPlayerControls(
     isPlaying: Boolean,
     contentCurrentPosition: Long,
-    player: ExoPlayer,
+    player: Player,
     state: VideoPlayerState,
     focusRequester: FocusRequester,
     onPlayPauseToggle: () -> Unit,
@@ -248,8 +256,8 @@ fun VideoPlayerControls(
     )
 }
 
-private fun Modifier.dPadEvents(
-    player: ExoPlayer,
+fun Modifier.dPadEvents(
+    player: Player,
     videoPlayerState: VideoPlayerState,
     pulseState: VideoPlayerPulseState
 ): Modifier = this.handleDPadKeyEvents(

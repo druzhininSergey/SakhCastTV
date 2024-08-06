@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
-import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.common.Player
 import com.example.sakhcasttv.data.repository.SakhCastRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -16,17 +16,17 @@ import javax.inject.Inject
 @HiltViewModel
 class VideoPlayerViewModel @Inject constructor(
     private val sakhCastRepository: SakhCastRepository,
-    val player: ExoPlayer,
+    val player: Player,
 ) : ViewModel() {
 
     private var _movieWatchState = MutableStateFlow(MovieWatchState())
     val movieWatchState = _movieWatchState.asStateFlow()
 
-    private var _isPlayerPlaying = MutableStateFlow(player.isPlaying)
-    val isPlayerPlaying = _isPlayerPlaying.asStateFlow()
-
-    private var _contentCurrentPosition = MutableStateFlow(player.currentPosition)
-    val contentCurrentPosition = _contentCurrentPosition.asStateFlow()
+//    private var _isPlayerPlaying = MutableStateFlow(player.isPlaying)
+//    val isPlayerPlaying = _isPlayerPlaying.asStateFlow()
+//
+//    private var _contentCurrentPosition = MutableStateFlow(player.currentPosition)
+//    val contentCurrentPosition = _contentCurrentPosition.asStateFlow()
 
     private var _isPositionSending = MutableStateFlow(false)
     private val isPositionSending = _isPositionSending.asStateFlow()
@@ -37,6 +37,17 @@ class VideoPlayerViewModel @Inject constructor(
         var position: Int = 0,
         var movieAlphaId: String = "",
     )
+
+//    private val playerListener = object : Player.Listener {
+//        override fun onPlaybackStateChanged(playbackState: Int) {
+//            _isPlayerPlaying.value = player.isPlaying
+//            _contentCurrentPosition.value = player.currentPosition
+//        }
+//
+//        override fun onIsPlayingChanged(isPlaying: Boolean) {
+//            _isPlayerPlaying.value = isPlaying
+//        }
+//    }
 
     fun preparePlayer(hlsUrl: String) {
         val mediaItem = MediaItem.fromUri(hlsUrl)
@@ -54,6 +65,7 @@ class VideoPlayerViewModel @Inject constructor(
                         .setUri(uri)
                         .build()
                 )
+//                player.addListener(playerListener)
                 player.prepare()
                 setMoviePosition()
             }
@@ -61,7 +73,7 @@ class VideoPlayerViewModel @Inject constructor(
     }
 
     fun onPlayPauseToggle() {
-        if (!isPlayerPlaying.value) player.play()
+        if (!player.isPlaying) player.play()
         else player.pause()
     }
 
@@ -77,9 +89,9 @@ class VideoPlayerViewModel @Inject constructor(
         player.seekBack()
     }
 
-    fun releasePlayer() {
-        player.release()
-    }
+//    fun releasePlayer() {
+//        player.release()
+//    }
 
     fun setMovieData(hlsUri: String, title: String, position: Int, movieAlphaId: String) {
         viewModelScope.launch {
@@ -111,7 +123,11 @@ class VideoPlayerViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
+//        player.removeListener(playerListener)
         _isPositionSending.value = false
+        player.stop()
+        player.clearMediaItems()
+
         player.release()
         Log.i("!!!", "player.release() ViewModel")
     }

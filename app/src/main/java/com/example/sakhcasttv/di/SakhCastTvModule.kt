@@ -2,19 +2,14 @@ package com.example.sakhcasttv.di
 
 import android.content.Context
 import android.content.SharedPreferences
-import androidx.annotation.OptIn
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStoreFile
-import androidx.media3.common.C
 import androidx.media3.common.Player
-import androidx.media3.common.util.UnstableApi
-import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import com.example.sakhcasttv.BASE_URL
 import com.example.sakhcasttv.SHARED_PREFS_TOKEN_KEY
 import com.example.sakhcasttv.data.api_service.SakhCastApiService
@@ -102,23 +97,9 @@ class SakhCastModule {
     fun provideSakhCastApiService(retrofit: Retrofit): SakhCastApiService =
         retrofit.create(SakhCastApiService::class.java)
 
-    @OptIn(UnstableApi::class)
     @Provides
-    @Singleton
-    fun provideExoPlayer(@ApplicationContext context: Context): ExoPlayer {
-        return ExoPlayer.Builder(context)
-            .setSeekForwardIncrementMs(10)
-            .setSeekBackIncrementMs(10)
-            .setMediaSourceFactory(
-                DefaultMediaSourceFactory(context)
-                    .setDataSourceFactory(DefaultHttpDataSource.Factory())
-            )
-            .setVideoScalingMode(C.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING)
-            .build()
-            .apply {
-                playWhenReady = true
-                repeatMode = Player.REPEAT_MODE_ONE
-            }
+    fun provideExoPlayer(@ApplicationContext context: Context): Player {
+        return ExoPlayer.Builder(context).build()
     }
 
     @Provides
