@@ -38,7 +38,6 @@ import com.example.sakhcasttv.ui.movie_player.MoviePlayer
 import com.example.sakhcasttv.ui.movie_series_view.MovieView
 import com.example.sakhcasttv.ui.movie_series_view.SeriesView
 import com.example.sakhcasttv.ui.profile_screen.ProfileScreen
-import com.example.sakhcasttv.ui.test_player.PlayerScreen
 
 @Composable
 fun AuthNavGraph(
@@ -195,25 +194,6 @@ fun AuthNavGraph(
                 title = title,
                 position = position,
                 movieAlphaId = movieAlphaId,
-            )
-        }
-        //TODO Удалить потом ниже
-        composable("test$PLAYER/{hls}/{title}/{position}/{movieAlphaId}") { backStackEntry ->
-            val hls = backStackEntry.arguments?.getString("hls") ?: ""
-            val title = backStackEntry.arguments?.getString("title") ?: ""
-            val positionStr = backStackEntry.arguments?.getString("position") ?: "0"
-            val position = positionStr.toInt()
-            val movieAlphaId = backStackEntry.arguments?.getString("movieAlphaId") ?: ""
-//            VideoPlayerScreen(
-//                hls = hls,
-//                title = title,
-//                position = position,
-//                movieAlphaId = movieAlphaId,
-//                onBackPressed = { navigateUp() },
-//            )
-            PlayerScreen(
-                mediaUrl = hls,
-                onBackPressed = { navigateUp() },
             )
         }
 //        composable("$SERIES_PLAYER/{seasonId}/{seriesTitle}/{episodeChosenIndex}/{rgChosen}") { backStackEntry ->

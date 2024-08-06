@@ -5,18 +5,14 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.FrameLayout
 import androidx.annotation.OptIn
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -33,26 +29,31 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerView
-import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Surface
 import androidx.tv.material3.SurfaceDefaults
 import androidx.tv.material3.Text
 import com.example.sakhcasttv.R
+import com.example.sakhcasttv.ui.general.handleDPadKeyEvents
+import com.example.sakhcasttv.ui.movie_player.components.AudioTrackSelectionDialog
+import com.example.sakhcasttv.ui.movie_player.components.QualitySelectionDialog
+import com.example.sakhcasttv.ui.movie_player.components.SubtitleSelectionDialog
 import com.example.sakhcasttv.ui.movie_player.components.VideoPlayerControlsIcon
 import com.example.sakhcasttv.ui.movie_player.components.VideoPlayerMainFrame
 import com.example.sakhcasttv.ui.movie_player.components.VideoPlayerMediaTitle
 import com.example.sakhcasttv.ui.movie_player.components.VideoPlayerOverlay
 import com.example.sakhcasttv.ui.movie_player.components.VideoPlayerPulse
+import com.example.sakhcasttv.ui.movie_player.components.VideoPlayerPulseState
 import com.example.sakhcasttv.ui.movie_player.components.VideoPlayerSeeker
+import com.example.sakhcasttv.ui.movie_player.components.VideoPlayerState
 import com.example.sakhcasttv.ui.movie_player.components.rememberVideoPlayerPulseState
 import com.example.sakhcasttv.ui.movie_player.components.rememberVideoPlayerState
 import kotlinx.coroutines.delay
@@ -97,7 +98,6 @@ fun MoviePlayer(
     val currentResizeModeIndex by playerViewModel.currentResizeModeIndex.collectAsStateWithLifecycle()
     val currentResizeModeName by playerViewModel.currentResizeModeName.collectAsStateWithLifecycle()
     var showResizeModeMessage by remember { mutableStateOf(false) }
-
 
     LaunchedEffect(hls) {
         playerViewModel.setHlsManifest(hls)
@@ -182,6 +182,7 @@ fun MoviePlayer(
                                 state = playerState,
                                 isPlaying = isPlaying
                             )
+                            Spacer(modifier = Modifier.width(16.dp))
 
                             VideoPlayerControlsIcon(
                                 icon = ImageVector.vectorResource(id = R.drawable.ic_cc),
@@ -190,6 +191,7 @@ fun MoviePlayer(
                                 state = playerState,
                                 isPlaying = isPlaying
                             )
+                            Spacer(modifier = Modifier.width(16.dp))
 
                             VideoPlayerControlsIcon(
                                 icon = ImageVector.vectorResource(id = R.drawable.ic_audio_list),
@@ -198,6 +200,7 @@ fun MoviePlayer(
                                 state = playerState,
                                 isPlaying = isPlaying
                             )
+                            Spacer(modifier = Modifier.width(16.dp))
 
                             VideoPlayerControlsIcon(
                                 icon = Icons.Default.Settings,
@@ -297,122 +300,27 @@ fun MoviePlayer(
     }
 }
 
-@OptIn(UnstableApi::class)
-@Composable
-fun AudioTrackSelectionDialog(
-    audioTracks: List<MoviePlayerViewModel.AudioTrackReceived>,
-    currentAudioTrack: MoviePlayerViewModel.AudioTrackReceived?,
-    onAudioTrackSelected: (MoviePlayerViewModel.AudioTrackReceived) -> Unit,
-    onDismiss: () -> Unit
-) {
-    Dialog(onDismissRequest = onDismiss) {
-        Surface(
-            shape = MaterialTheme.shapes.medium
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text("Выберите аудиодорожку", style = MaterialTheme.typography.bodyMedium)
-                Spacer(modifier = Modifier.height(16.dp))
-                audioTracks.forEach { audioTrack ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onAudioTrackSelected(audioTrack) }
-                            .padding(vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = audioTrack.name,
-                            modifier = Modifier.weight(1f)
-                        )
-                        if (audioTrack == currentAudioTrack) {
-                            Icon(
-                                imageVector = Icons.Default.Check,
-                                contentDescription = "Выбрано"
-                            )
-                        }
-                    }
-                }
-            }
+private fun Modifier.dPadEvents(
+    player: Player,
+    videoPlayerState: VideoPlayerState,
+    pulseState: VideoPlayerPulseState
+): Modifier = this.handleDPadKeyEvents(
+    onLeft = {
+        if (!videoPlayerState.controlsVisible) {
+            player.seekBack()
+            pulseState.setType(VideoPlayerPulse.Type.BACK)
         }
-    }
-}
-
-@OptIn(UnstableApi::class)
-@Composable
-fun QualitySelectionDialog(
-    qualities: List<MoviePlayerViewModel.VideoQuality>,
-    currentQuality: MoviePlayerViewModel.VideoQuality?,
-    onQualitySelected: (MoviePlayerViewModel.VideoQuality) -> Unit,
-    onDismiss: () -> Unit
-) {
-    Dialog(onDismissRequest = onDismiss) {
-        Surface(
-            shape = MaterialTheme.shapes.medium
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text("Выберите качество", style = MaterialTheme.typography.bodyMedium)
-                Spacer(modifier = Modifier.height(16.dp))
-                qualities.forEach { quality ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onQualitySelected(quality) }
-                            .padding(vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = if (quality.resolution == "Авто") "Авто" else "${quality.resolution} (${quality.bandwidth / 1000} Kbps)",
-                            modifier = Modifier.weight(1f)
-                        )
-                        if (quality == currentQuality) {
-                            Icon(
-                                imageVector = Icons.Default.Check,
-                                contentDescription = "Выбрано"
-                            )
-                        }
-                    }
-                }
-            }
+    },
+    onRight = {
+        if (!videoPlayerState.controlsVisible) {
+            player.seekForward()
+            pulseState.setType(VideoPlayerPulse.Type.FORWARD)
         }
+    },
+    onUp = { videoPlayerState.showControls() },
+    onDown = { videoPlayerState.showControls() },
+    onEnter = {
+        player.pause()
+        videoPlayerState.showControls()
     }
-}
-
-@OptIn(UnstableApi::class)
-@Composable
-fun SubtitleSelectionDialog(
-    subtitles: List<MoviePlayerViewModel.Subtitle>,
-    currentSubtitle: MoviePlayerViewModel.Subtitle?,
-    onSubtitleSelected: (MoviePlayerViewModel.Subtitle) -> Unit,
-    onDismiss: () -> Unit
-) {
-    Dialog(onDismissRequest = onDismiss) {
-        Surface(
-            shape = MaterialTheme.shapes.medium
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text("Выберите субтитры", style = MaterialTheme.typography.bodyMedium)
-                Spacer(modifier = Modifier.height(16.dp))
-                subtitles.forEach { subtitle ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onSubtitleSelected(subtitle) }
-                            .padding(vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = subtitle.name,
-                            modifier = Modifier.weight(1f)
-                        )
-                        if (subtitle == currentSubtitle) {
-                            Icon(
-                                imageVector = Icons.Default.Check,
-                                contentDescription = "Выбрано"
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
+)
