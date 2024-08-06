@@ -88,6 +88,10 @@ fun MoviePlayer(
     val currentSubtitle by playerViewModel.currentSubtitle.collectAsStateWithLifecycle()
     var showSubtitleDialog by remember { mutableStateOf(false) }
 
+    val availableAudioTracks by playerViewModel.availableAudioTracks.collectAsStateWithLifecycle()
+    val currentAudioTrack by playerViewModel.currentAudioTrack.collectAsStateWithLifecycle()
+    var showAudioTrackDialog by remember { mutableStateOf(false) }
+
     LaunchedEffect(hls) {
         playerViewModel.setHlsManifest(hls)
     }
@@ -166,6 +170,14 @@ fun MoviePlayer(
                             )
 
                             VideoPlayerControlsIcon(
+                                icon = ImageVector.vectorResource(id = R.drawable.ic_audio_list),
+                                contentDescription = "Аудиодорожки",
+                                onClick = { showAudioTrackDialog = true },
+                                state = playerState,
+                                isPlaying = isPlaying
+                            )
+
+                            VideoPlayerControlsIcon(
                                 icon = Icons.Default.Settings,
                                 contentDescription = "Качество видео",
                                 onClick = { showQualityDialog = true },
@@ -221,6 +233,56 @@ fun MoviePlayer(
                 },
                 onDismiss = { showSubtitleDialog = false }
             )
+        }
+        if (showAudioTrackDialog) {
+            AudioTrackSelectionDialog(
+                audioTracks = availableAudioTracks,
+                currentAudioTrack = currentAudioTrack,
+                onAudioTrackSelected = { audioTrack ->
+                    playerViewModel.setAudioTrack(audioTrack)
+                    showAudioTrackDialog = false
+                },
+                onDismiss = { showAudioTrackDialog = false }
+            )
+        }
+    }
+}
+
+@Composable
+fun AudioTrackSelectionDialog(
+    audioTracks: List<MoviePlayerViewModel.AudioTrackReceived>,
+    currentAudioTrack: MoviePlayerViewModel.AudioTrackReceived?,
+    onAudioTrackSelected: (MoviePlayerViewModel.AudioTrackReceived) -> Unit,
+    onDismiss: () -> Unit
+) {
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = MaterialTheme.shapes.medium
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text("Выберите аудиодорожку", style = MaterialTheme.typography.bodyMedium)
+                Spacer(modifier = Modifier.height(16.dp))
+                audioTracks.forEach { audioTrack ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onAudioTrackSelected(audioTrack) }
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = audioTrack.name,
+                            modifier = Modifier.weight(1f)
+                        )
+                        if (audioTrack == currentAudioTrack) {
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = "Выбрано"
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }
