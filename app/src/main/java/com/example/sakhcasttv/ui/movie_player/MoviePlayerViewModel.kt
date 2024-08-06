@@ -54,6 +54,13 @@ class MoviePlayerViewModel @Inject constructor(
     private val _currentSubtitle = MutableStateFlow<Subtitle?>(null)
     val currentSubtitle: StateFlow<Subtitle?> = _currentSubtitle.asStateFlow()
 
+    private val _availableAudioTracks = MutableStateFlow<List<AudioTrackReceived>>(emptyList())
+    val availableAudioTracks: StateFlow<List<AudioTrackReceived>> =
+        _availableAudioTracks.asStateFlow()
+
+    private val _currentAudioTrack = MutableStateFlow<AudioTrackReceived?>(null)
+    val currentAudioTrack: StateFlow<AudioTrackReceived?> = _currentAudioTrack.asStateFlow()
+
     private var baseUrl: String = ""
 
     data class MovieWatchState(
@@ -71,6 +78,8 @@ class MoviePlayerViewModel @Inject constructor(
 
     data class Subtitle(val id: String, val name: String, val language: String)
 
+    data class AudioTrackReceived(val id: String, val name: String, val language: String)
+
     private val playerListener =
         object : Player.Listener {
             override fun onTracksChanged(tracks: Tracks) {
@@ -84,12 +93,17 @@ class MoviePlayerViewModel @Inject constructor(
                     _currentSubtitle.value =
                         _availableSubtitles.value.firstOrNull { it.id == "off" }
                 }
+
+                updateAvailableAudioTracks()
             }
 
             override fun onPlaybackStateChanged(playbackState: Int) {
                 _isPlaying.value = playbackState == Player.STATE_READY && player.playWhenReady
                 if (playbackState == Player.STATE_READY) {
                     _duration.value = player.duration
+                    startPositionUpdates()
+                } else {
+                    stopPositionUpdates()
                 }
             }
 
@@ -100,6 +114,67 @@ class MoviePlayerViewModel @Inject constructor(
 
     init {
         player.addListener(playerListener)
+        startPositionUpdates()
+    }
+
+    private fun updateAvailableAudioTracks() {
+        val audioTracks = mutableListOf<AudioTrackReceived>()
+
+        player.currentTracks.groups.forEachIndexed { index, trackGroup ->
+            if (trackGroup.type == C.TRACK_TYPE_AUDIO) {
+                for (i in 0 until trackGroup.length) {
+                    val format = trackGroup.getTrackFormat(i)
+                    val language = format.language ?: "unknown"
+                    val name = format.label ?: language
+                    val id = "$language-$i"
+                    audioTracks.add(AudioTrackReceived(id, name, language))
+                }
+            }
+        }
+
+        _availableAudioTracks.value = audioTracks
+
+        val currentAudioTrack = player.currentTracks.groups
+            .filter { it.type == C.TRACK_TYPE_AUDIO }
+            .flatMap { group ->
+                (0 until group.length)
+                    .filter { group.isTrackSelected(it) }
+                    .map { group.getTrackFormat(it) }
+            }
+            .firstOrNull()
+
+        _currentAudioTrack.value = currentAudioTrack?.let { track ->
+            audioTracks.find {
+                it.language == track.language && it.name == (track.label ?: track.language)
+            }
+        } ?: audioTracks.firstOrNull()
+    }
+
+    fun setAudioTrack(audioTrack: AudioTrackReceived) {
+        viewModelScope.launch {
+            _currentAudioTrack.value = audioTrack
+
+            player.trackSelectionParameters = player.trackSelectionParameters.buildUpon()
+                .setPreferredAudioLanguage(audioTrack.language)
+                .build()
+
+            player.currentTracks.groups
+                .filter { it.type == C.TRACK_TYPE_AUDIO }
+                .forEach { group ->
+                    for (i in 0 until group.length) {
+                        val format = group.getTrackFormat(i)
+                        if (format.language == audioTrack.language && format.label == audioTrack.name) {
+                            (player as ExoPlayer).trackSelectionParameters =
+                                player.trackSelectionParameters.buildUpon()
+                                    .addOverride(TrackSelectionOverride(group.mediaTrackGroup, i))
+                                    .build()
+                            break
+                        }
+                    }
+                }
+
+            (player as ExoPlayer).trackSelectionParameters = player.trackSelectionParameters
+        }
     }
 
     private fun updateAvailableSubtitles() {
@@ -247,6 +322,7 @@ class MoviePlayerViewModel @Inject constructor(
             player.prepare()
             player.seekTo(movieWatchState.value.position.toLong())
             player.play()
+            startPositionUpdates()
         }
     }
 
@@ -278,8 +354,10 @@ class MoviePlayerViewModel @Inject constructor(
     fun togglePlayPause() {
         if (player.isPlaying) {
             player.pause()
+            stopPositionUpdates()
         } else {
             player.play()
+            startPositionUpdates()
         }
     }
 
