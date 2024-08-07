@@ -351,7 +351,6 @@ fun MoviePlayer(
                 containerColor = MaterialTheme.colorScheme.surface,
                 textContentColor = MaterialTheme.colorScheme.onSurface,
                 onDismissRequest = { playerViewModel.playFromBeginning() },
-//                title = { Text("Продолжить просмотр?") },
                 text = { Text("Продолжить с ${movieState.position / 60} минут?") },
                 confirmButton = {
                     TextButton(onClick = { playerViewModel.continuePlaying(position = position) }) {
