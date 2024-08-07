@@ -256,7 +256,7 @@ fun MoviePlayer(
             }
             Box(
                 modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.BottomCenter
+                contentAlignment = Alignment.TopCenter
             ) {
                 Surface(
                     modifier = Modifier
@@ -266,7 +266,7 @@ fun MoviePlayer(
                     shape = MaterialTheme.shapes.small,
                     colors = SurfaceDefaults.colors(
                         containerColor = MaterialTheme.colorScheme.surface.copy(
-                            alpha = 0.8f
+                            alpha = 0.9f
                         )
                     ),
                     tonalElevation = 2.dp

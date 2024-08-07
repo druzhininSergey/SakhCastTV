@@ -13,11 +13,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
+import com.example.sakhcasttv.R
 import com.example.sakhcasttv.ui.theme.SakhCastTVTheme
 
 enum class VideoPlayerMediaTitleType { AD, LIVE, DEFAULT }
@@ -36,46 +39,52 @@ fun VideoPlayerMediaTitle(
         append(tertiaryText)
     }
     Column(modifier.fillMaxWidth()) {
-        Text(title, style = MaterialTheme.typography.headlineMedium)
-        Spacer(Modifier.height(4.dp))
-        Row {
-            // TODO: Replaced with Badge component once developed
-            when (type) {
-                VideoPlayerMediaTitleType.AD -> {
-                    Text(
-                        text = "Ad",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = Color.Black,
-                        modifier = Modifier
-                            .background(Color(0xFFFBC02D), shape = RoundedCornerShape(12.dp))
-                            .padding(horizontal = 8.dp, vertical = 2.dp)
-                            .alignByBaseline()
-                    )
-                    Spacer(Modifier.width(8.dp))
+        Text(
+            text = title,
+            style = MaterialTheme.typography.headlineMedium,
+            fontFamily = FontFamily(Font(R.font.jura_bold))
+        )
+        if (secondaryText != "") {
+            Spacer(Modifier.height(4.dp))
+            Row {
+                // TODO: Replaced with Badge component once developed
+                when (type) {
+                    VideoPlayerMediaTitleType.AD -> {
+                        Text(
+                            text = "Ad",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = Color.Black,
+                            modifier = Modifier
+                                .background(Color(0xFFFBC02D), shape = RoundedCornerShape(12.dp))
+                                .padding(horizontal = 8.dp, vertical = 2.dp)
+                                .alignByBaseline()
+                        )
+                        Spacer(Modifier.width(8.dp))
+                    }
+
+                    VideoPlayerMediaTitleType.LIVE -> {
+                        Text(
+                            text = "Live",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.inverseSurface,
+                            modifier = Modifier
+                                .background(Color(0xFFCC0000), shape = RoundedCornerShape(12.dp))
+                                .padding(horizontal = 8.dp, vertical = 2.dp)
+                                .alignByBaseline()
+                        )
+
+                        Spacer(Modifier.width(8.dp))
+                    }
+
+                    VideoPlayerMediaTitleType.DEFAULT -> {}
                 }
 
-                VideoPlayerMediaTitleType.LIVE -> {
-                    Text(
-                        text = "Live",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.inverseSurface,
-                        modifier = Modifier
-                            .background(Color(0xFFCC0000), shape = RoundedCornerShape(12.dp))
-                            .padding(horizontal = 8.dp, vertical = 2.dp)
-                            .alignByBaseline()
-                    )
-
-                    Spacer(Modifier.width(8.dp))
-                }
-
-                VideoPlayerMediaTitleType.DEFAULT -> {}
+                Text(
+                    text = subTitle,
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.alignByBaseline()
+                )
             }
-
-            Text(
-                text = subTitle,
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.alignByBaseline()
-            )
         }
     }
 }

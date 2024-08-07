@@ -21,12 +21,16 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.MaterialTheme
 import com.example.sakhcasttv.ui.general.handleDPadKeyEvents
 import com.example.sakhcasttv.ui.general.ifElse
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun RowScope.VideoPlayerControllerIndicator(
@@ -46,17 +50,19 @@ fun RowScope.VideoPlayerControllerIndicator(
         targetValue = 4.dp.times((if (isFocused) 2.5f else 1f)), label = ""
     )
     var seekProgress by remember { mutableFloatStateOf(0f) }
-
     val seekTime = remember(seekProgress, contentDuration) {
         val seekMillis = (contentDuration.inWholeMilliseconds * seekProgress).toLong()
         seekMillis.milliseconds.toComponents { hours, minutes, seconds, _ ->
             if (hours > 0) {
-                "${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}"
+                "${hours.toString().padStart(2, '0')}:${
+                    minutes.toString().padStart(2, '0')
+                }:${seconds.toString().padStart(2, '0')}"
             } else {
                 "${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}"
             }
         }
     }
+
 
     LaunchedEffect(isSelected) {
         if (isSelected) {
@@ -66,31 +72,44 @@ fun RowScope.VideoPlayerControllerIndicator(
         }
     }
 
+    val seekStep = remember(contentDuration) {
+        (10.seconds / contentDuration).toFloat().coerceAtMost(1f)
+    }
+
     val handleSeekEventModifier = Modifier.handleDPadKeyEvents(
         onEnter = {
             isSelected = !isSelected
             onSeek(seekProgress)
         },
         onLeft = {
-            seekProgress = (seekProgress - 0.01f).coerceAtLeast(0f)
+            seekProgress = (seekProgress - seekStep).coerceAtLeast(0f)
         },
         onRight = {
-            seekProgress = (seekProgress + 0.01f).coerceAtMost(1f)
+            seekProgress = (seekProgress + seekStep).coerceAtMost(1f)
         },
+        initialRepeatDelayMillis = 100,
+        fastRepeatDelayMillis = 50,
+        superFastRepeatDelayMillis = 10
     )
 
     val handleDpadCenterClickModifier = Modifier.handleDPadKeyEvents(
         onEnter = {
             seekProgress = progress
             isSelected = !isSelected
-        }
+        },
+        initialRepeatDelayMillis = 100,
+        fastRepeatDelayMillis = 50,
+        superFastRepeatDelayMillis = 10
     )
     AnimatedVisibility(visible = isSelected) {
         Text(
-            text = seekTime,
+            text = "- $seekTime",
             color = color,
-            style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.padding(bottom = 4.dp)
+            fontFamily = FontFamily.Monospace,  // Шрифт с фиксированной шириной
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            overflow = TextOverflow.Visible,
+            modifier = Modifier.padding()
         )
     }
 
