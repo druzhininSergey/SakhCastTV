@@ -60,7 +60,8 @@ fun VideoPlayerSeeker(
         VideoPlayerControllerIndicator(
             progress = (contentProgress / contentDuration).toFloat(),
             onSeek = onSeek,
-            state = state
+            state = state,
+            contentDuration = contentDuration
         )
         TimeText(text = contentDurationString, modifier = Modifier.width(80.dp))
     }

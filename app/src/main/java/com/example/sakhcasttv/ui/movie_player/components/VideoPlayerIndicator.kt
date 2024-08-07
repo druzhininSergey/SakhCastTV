@@ -25,12 +25,15 @@ import androidx.compose.ui.unit.dp
 import androidx.tv.material3.MaterialTheme
 import com.example.sakhcasttv.ui.general.handleDPadKeyEvents
 import com.example.sakhcasttv.ui.general.ifElse
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun RowScope.VideoPlayerControllerIndicator(
     progress: Float,
     onSeek: (seekProgress: Float) -> Unit,
-    state: VideoPlayerState
+    state: VideoPlayerState,
+    contentDuration: Duration
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     var isSelected by remember { mutableStateOf(false) }
@@ -43,6 +46,17 @@ fun RowScope.VideoPlayerControllerIndicator(
         targetValue = 4.dp.times((if (isFocused) 2.5f else 1f)), label = ""
     )
     var seekProgress by remember { mutableFloatStateOf(0f) }
+
+    val seekTime = remember(seekProgress, contentDuration) {
+        val seekMillis = (contentDuration.inWholeMilliseconds * seekProgress).toLong()
+        seekMillis.milliseconds.toComponents { hours, minutes, seconds, _ ->
+            if (hours > 0) {
+                "${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}"
+            } else {
+                "${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}"
+            }
+        }
+    }
 
     LaunchedEffect(isSelected) {
         if (isSelected) {
@@ -73,7 +87,7 @@ fun RowScope.VideoPlayerControllerIndicator(
     )
     AnimatedVisibility(visible = isSelected) {
         Text(
-            text = "тест",
+            text = seekTime,
             color = color,
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.padding(bottom = 4.dp)
