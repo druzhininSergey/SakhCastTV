@@ -1,6 +1,5 @@
 package com.example.sakhcasttv.ui.movie_player
 
-import android.util.Log
 import androidx.annotation.OptIn
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -380,11 +379,11 @@ class MoviePlayerViewModel @Inject constructor(
                 player.play()
             }
             startPositionUpdates()
+            setMoviePosition()
         }
     }
 
     fun continuePlaying(position: Int) {
-        Log.i("!!!", "VM position = $position, long = ${(position * 1000).toLong()}")
         player.seekTo((position * 1000).toLong())
         player.play()
         _showContinueDialog.value = false
@@ -440,19 +439,26 @@ class MoviePlayerViewModel @Inject constructor(
         player.seekTo(position)
     }
 
-    fun savePosition() {
+    private fun setMoviePosition() {
         viewModelScope.launch {
-            val movieAlphaId = _movieWatchState.value.movieAlphaId
-            val currentPosition = (player.currentPosition / 1000).toInt()
-            sakhCastRepository.setMoviePosition(movieAlphaId, currentPosition)
-            _movieWatchState.value = _movieWatchState.value.copy(position = currentPosition)
+            while (true) {
+                if (player.isPlaying) {
+                    delay(5000)
+                    val movieAlphaId = _movieWatchState.value.movieAlphaId
+                    val currentPosition = (player.currentPosition / 1000).toInt()
+                    sakhCastRepository.setMoviePosition(movieAlphaId, currentPosition)
+                    _movieWatchState.value = _movieWatchState.value.copy(position = currentPosition)
+                } else{
+                    delay(5000)
+                    continue
+                }
+            }
         }
     }
 
     override fun onCleared() {
         super.onCleared()
         stopPositionUpdates()
-        savePosition()
         player.removeListener(playerListener)
         player.release()
     }

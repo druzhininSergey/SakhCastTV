@@ -136,7 +136,6 @@ fun MoviePlayer(
         onDispose {
             window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             lifecycleOwner.lifecycle.removeObserver(observer)
-            playerViewModel.savePosition()
         }
     }
 
