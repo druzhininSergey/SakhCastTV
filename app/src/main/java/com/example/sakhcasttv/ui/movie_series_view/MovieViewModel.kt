@@ -8,7 +8,7 @@ import com.example.sakhcasttv.data.repository.SakhCastRepository
 import com.example.sakhcasttv.model.Movie
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,7 +21,7 @@ class MovieViewModel @Inject constructor(
     val movieState: LiveData<MovieState> = _movieState
 
     private val _position = MutableStateFlow(0)
-    val position: StateFlow<Int> = _position
+    val position = _position.asStateFlow()
 
     data class MovieState(
         var movie: Movie? = null,
@@ -29,11 +29,9 @@ class MovieViewModel @Inject constructor(
     )
 
     fun getMoviePosition(alphaId: String) {
-        if (_position.value == 0) {
-            viewModelScope.launch {
-                val position = sakhCastRepository.getMoviePosition(alphaId) ?: 0
-                _position.value = position
-            }
+        viewModelScope.launch {
+            val position = sakhCastRepository.getMoviePosition(alphaId) ?: 0
+            _position.value = position
         }
     }
 

@@ -35,6 +35,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.Button
 import androidx.tv.material3.ButtonDefaults
 import androidx.tv.material3.Icon
@@ -61,14 +62,16 @@ fun MovieView(
     var hlsToSend by remember { mutableStateOf("") }
     var titleToSend by remember { mutableStateOf("") }
     var positionToSend by remember { mutableIntStateOf(0) }
-    val positionUpdated by remember {
-        mutableIntStateOf(movieViewModel.position.value)
+    val positionUpdated by movieViewModel.position.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        if (alphaId != null && movie != null) { movieViewModel.getMoviePosition(alphaId) }
     }
 
     LaunchedEffect(alphaId) {
         if (alphaId != null && movie == null) movieViewModel.getFullMovieWithRecommendations(alphaId)
-        if (alphaId != null && movie != null) movieViewModel.getMoviePosition(alphaId)
     }
+
     val isFavorite = remember {
         mutableStateOf(movieState.value.isFavorite ?: false)
     }
