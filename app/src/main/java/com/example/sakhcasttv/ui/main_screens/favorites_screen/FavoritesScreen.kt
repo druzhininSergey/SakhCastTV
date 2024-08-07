@@ -46,7 +46,7 @@ fun FavoritesScreen(
     LaunchedEffect(Unit) {
         if (allScreensStateCollected.value.movieCardsWatched == null) {
             favoritesScreenViewModel.getAllContent()
-        }
+        } else favoritesScreenViewModel.updateAllContent()
     }
 
     LaunchedEffect(favoritesScreenState) {

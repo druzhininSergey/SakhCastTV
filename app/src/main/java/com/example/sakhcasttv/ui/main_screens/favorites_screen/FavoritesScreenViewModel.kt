@@ -59,4 +59,31 @@ class FavoritesScreenViewModel @Inject constructor(private val sakhCastRepositor
         }
     }
 
+    fun updateAllContent() {
+        try {
+            viewModelScope.launch {
+                val seriesCardWatching = sakhCastRepository.getSeriesFavorites("watching")
+                val seriesCardWillWatch = sakhCastRepository.getSeriesFavorites("will")
+                val seriesCardFinishedWatching = sakhCastRepository.getSeriesFavorites("stopped")
+                val seriesCardWatched = sakhCastRepository.getSeriesFavorites("watched")
+                val movieCardsWillWatch = sakhCastRepository.getMovieFavorites(kind = "will")
+                val movieCardsWatched = sakhCastRepository.getMovieFavorites(kind = "watched")
+
+                _favoritesScreenState.update { currentState ->
+                    currentState.copy(
+                        seriesCardWatching = seriesCardWatching,
+                        seriesCardWillWatch = seriesCardWillWatch,
+                        seriesCardFinishedWatching = seriesCardFinishedWatching,
+                        seriesCardWatched = seriesCardWatched,
+                        movieCardsWillWatch = movieCardsWillWatch,
+                        movieCardsWatched = movieCardsWatched,
+                        isLoading = false
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            _favoritesScreenState.update { it.copy(isLoading = false) }
+        }
+    }
+
 }

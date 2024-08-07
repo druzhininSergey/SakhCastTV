@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -20,6 +19,7 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
 import com.example.sakhcasttv.Colors
 import com.example.sakhcasttv.data.formatMinSec
@@ -39,14 +39,14 @@ fun HomeScreen(
     loadDataToHomeScreen: (HomeScreenViewModel.HomeScreenState) -> Unit,
     homeScreenViewModel: HomeScreenViewModel = hiltViewModel()
 ) {
-    val homeScreenState by homeScreenViewModel.homeScreenState.collectAsState()
-    val isLoading by homeScreenViewModel.isLoading.collectAsState()
-    val allScreensStateCollected by allScreensHomeState.collectAsState()
+    val homeScreenState by homeScreenViewModel.homeScreenState.collectAsStateWithLifecycle()
+    val isLoading by homeScreenViewModel.isLoading.collectAsStateWithLifecycle()
+    val allScreensStateCollected by allScreensHomeState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         if (allScreensHomeState.value.lastWatched == null) {
             homeScreenViewModel.getAllScreenData()
-        }
+        } else homeScreenViewModel.refreshData()
     }
     LaunchedEffect(homeScreenState) {
         if (!isLoading && homeScreenState.lastWatched != null) {
