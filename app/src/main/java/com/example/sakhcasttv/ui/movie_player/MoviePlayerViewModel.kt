@@ -114,19 +114,32 @@ class MoviePlayerViewModel @Inject constructor(
             }
 
             override fun onPlaybackStateChanged(playbackState: Int) {
-                _isPlaying.value = playbackState == Player.STATE_READY && player.playWhenReady
-                if (playbackState == Player.STATE_READY) {
-                    _duration.value = player.duration
-                    startPositionUpdates()
-                } else {
-                    stopPositionUpdates()
+                when (playbackState) {
+                    Player.STATE_ENDED -> {
+                        stopPlayback()
+                    }
+                    Player.STATE_READY -> {
+                        _duration.value = player.duration
+                        startPositionUpdates()
+                    }
+                    else -> {
+                        stopPositionUpdates()
+                    }
                 }
+                _isPlaying.value = playbackState == Player.STATE_READY && player.playWhenReady
             }
 
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 _isPlaying.value = isPlaying
             }
         }
+
+    private fun stopPlayback() {
+        player.pause()
+        player.seekTo(0)
+        _isPlaying.value = false
+        stopPositionUpdates()
+    }
 
     init {
         player.addListener(playerListener)
@@ -384,13 +397,18 @@ class MoviePlayerViewModel @Inject constructor(
     }
 
     fun togglePlayPause() {
-        if (player.isPlaying) {
+        if (player.playbackState == Player.STATE_ENDED) {
+            player.seekTo(0)
+            player.play()
+            startPositionUpdates()
+        } else if (player.isPlaying) {
             player.pause()
             stopPositionUpdates()
         } else {
             player.play()
             startPositionUpdates()
         }
+        _isPlaying.value = player.isPlaying
     }
 
     fun seekTo(position: Long) {

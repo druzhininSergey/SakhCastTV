@@ -1,6 +1,7 @@
 package com.example.sakhcasttv.ui.movie_player.components
 
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.Composable
@@ -10,6 +11,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.unit.dp
 import com.example.sakhcasttv.R
 import com.example.sakhcasttv.ui.general.StringConstants
 import kotlin.time.Duration
@@ -54,13 +56,13 @@ fun VideoPlayerSeeker(
                 .Composable
                 .VideoPlayerControlPlayPauseButton
         )
-        VideoPlayerControllerText(text = contentProgressString)
+        TimeText(text = contentProgressString, modifier = Modifier.width(80.dp))
         VideoPlayerControllerIndicator(
             progress = (contentProgress / contentDuration).toFloat(),
             onSeek = onSeek,
             state = state
         )
-        VideoPlayerControllerText(text = contentDurationString)
+        TimeText(text = contentDurationString, modifier = Modifier.width(80.dp))
     }
 }
 
