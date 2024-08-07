@@ -25,6 +25,10 @@ class VideoPlayerState internal constructor(
         channel.trySend(seconds)
     }
 
+    fun hideControls() {
+        _controlsVisible = false
+    }
+
     private val channel = Channel<Int>(CONFLATED)
 
     @OptIn(FlowPreview::class)

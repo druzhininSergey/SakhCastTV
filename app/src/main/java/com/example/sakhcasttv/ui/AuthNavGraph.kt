@@ -194,6 +194,7 @@ fun AuthNavGraph(
                 title = title,
                 position = position,
                 movieAlphaId = movieAlphaId,
+                navigateUp = navigateUp,
             )
         }
 //        composable("$SERIES_PLAYER/{seasonId}/{seriesTitle}/{episodeChosenIndex}/{rgChosen}") { backStackEntry ->

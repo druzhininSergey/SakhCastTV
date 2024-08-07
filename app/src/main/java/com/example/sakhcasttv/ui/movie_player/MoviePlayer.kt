@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,6 +43,7 @@ import androidx.tv.material3.Surface
 import androidx.tv.material3.SurfaceDefaults
 import androidx.tv.material3.Text
 import com.example.sakhcasttv.R
+import com.example.sakhcasttv.ui.general.CustomDialog
 import com.example.sakhcasttv.ui.general.handleDPadKeyEvents
 import com.example.sakhcasttv.ui.movie_player.components.AudioTrackSelectionDialog
 import com.example.sakhcasttv.ui.movie_player.components.QualitySelectionDialog
@@ -67,6 +69,7 @@ fun MoviePlayer(
     title: String,
     position: Int,
     movieAlphaId: String,
+    navigateUp: () -> Boolean,
     playerViewModel: MoviePlayerViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -98,6 +101,8 @@ fun MoviePlayer(
     val currentResizeModeIndex by playerViewModel.currentResizeModeIndex.collectAsStateWithLifecycle()
     val currentResizeModeName by playerViewModel.currentResizeModeName.collectAsStateWithLifecycle()
     var showResizeModeMessage by remember { mutableStateOf(false) }
+
+    val displayDialog = remember { mutableStateOf(false) }
 
     LaunchedEffect(hls) {
         playerViewModel.setHlsManifest(hls)
@@ -139,10 +144,19 @@ fun MoviePlayer(
             .dPadEvents(
                 playerViewModel.player,
                 playerState,
-                pulseState
+                pulseState,
+                displayDialog
             )
             .focusable()
     ) {
+        if (displayDialog.value) {
+            CustomDialog(
+                openDialogCustom = displayDialog,
+                text = "Выйти из плеера?",
+                navigateUp = { navigateUp() }
+            )
+        }
+
         AndroidView(
             modifier = Modifier.fillMaxSize(),
             factory = {
@@ -304,7 +318,8 @@ fun MoviePlayer(
 private fun Modifier.dPadEvents(
     player: Player,
     videoPlayerState: VideoPlayerState,
-    pulseState: VideoPlayerPulseState
+    pulseState: VideoPlayerPulseState,
+    openDialogCustom: MutableState<Boolean>,
 ): Modifier = this.handleDPadKeyEvents(
     onLeft = {
         if (!videoPlayerState.controlsVisible) {
@@ -323,5 +338,14 @@ private fun Modifier.dPadEvents(
     onEnter = {
         player.pause()
         videoPlayerState.showControls()
+    },
+    onBack = {
+        if (videoPlayerState.controlsVisible) {
+            videoPlayerState.hideControls()
+            true
+        } else {
+            openDialogCustom.value = true
+            false
+        }
     }
 )

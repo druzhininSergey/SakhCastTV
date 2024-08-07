@@ -33,11 +33,19 @@ import androidx.tv.material3.Text
 import com.example.sakhcasttv.R
 
 @Composable
-fun CustomDialog(openDialogCustom: MutableState<Boolean>, onExitClick: () -> Unit) {
+fun CustomDialog(
+    openDialogCustom: MutableState<Boolean>,
+    text: String,
+    onExitClick: (() -> Unit)? = null,
+    navigateUp: (() -> Boolean)? = null,
+) {
     Dialog(onDismissRequest = { openDialogCustom.value = false }) {
-        CustomDialogUI(openDialogCustom = openDialogCustom) {
-            onExitClick()
-        }
+        CustomDialogUI(
+            openDialogCustom = openDialogCustom,
+            text = text,
+            onExitClick = onExitClick,
+            navigateUp = navigateUp
+        )
     }
 }
 
@@ -46,7 +54,9 @@ fun CustomDialog(openDialogCustom: MutableState<Boolean>, onExitClick: () -> Uni
 fun CustomDialogUI(
     modifier: Modifier = Modifier,
     openDialogCustom: MutableState<Boolean>,
-    onExitClick: () -> Unit,
+    text: String,
+    onExitClick: (() -> Unit)? = null,
+    navigateUp: (() -> Boolean)? = null,
 ) {
     val focusRequester = remember { FocusRequester() }
 
@@ -88,7 +98,7 @@ fun CustomDialogUI(
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
-                    text = "Желаете выйти из приложения?",
+                    text = text,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .padding(top = 10.dp, start = 25.dp, end = 25.dp)
@@ -120,7 +130,8 @@ fun CustomDialogUI(
                 TextButton(
                     onClick = {
                         openDialogCustom.value = false
-                        onExitClick()
+                        if (onExitClick != null) onExitClick()
+                        else if (navigateUp != null) navigateUp()
                     }, modifier = Modifier
                         .weight(1F),
                     shape = RoundedCornerShape(0.dp)
@@ -140,5 +151,9 @@ fun CustomDialogUI(
 @Preview(name = "Custom Dialog")
 @Composable
 fun MyDialogUIPreview() {
-    CustomDialogUI(openDialogCustom = mutableStateOf(false)) {}
+    CustomDialogUI(
+        openDialogCustom = mutableStateOf(false),
+        text = "Желаете выйти из приложения?"
+
+    )
 }
