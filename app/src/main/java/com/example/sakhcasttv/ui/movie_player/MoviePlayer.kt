@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -102,6 +104,8 @@ fun MoviePlayer(
     val currentResizeModeIndex by playerViewModel.currentResizeModeIndex.collectAsStateWithLifecycle()
     val currentResizeModeName by playerViewModel.currentResizeModeName.collectAsStateWithLifecycle()
     var showResizeModeMessage by remember { mutableStateOf(false) }
+
+    val showContinueDialog by playerViewModel.showContinueDialog.collectAsStateWithLifecycle()
 
     var showExitSnackbar by remember { mutableStateOf(false) }
 
@@ -340,6 +344,25 @@ fun MoviePlayer(
                     showAudioTrackDialog = false
                 },
                 onDismiss = { showAudioTrackDialog = false }
+            )
+        }
+        if (showContinueDialog) {
+            AlertDialog(
+                containerColor = MaterialTheme.colorScheme.surface,
+                textContentColor = MaterialTheme.colorScheme.onSurface,
+                onDismissRequest = { playerViewModel.playFromBeginning() },
+//                title = { Text("Продолжить просмотр?") },
+                text = { Text("Продолжить с ${movieState.position / 60} минут?") },
+                confirmButton = {
+                    TextButton(onClick = { playerViewModel.continuePlaying(position = position) }) {
+                        Text("Да")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { playerViewModel.playFromBeginning() }) {
+                        Text("Нет, начать сначала")
+                    }
+                }
             )
         }
     }

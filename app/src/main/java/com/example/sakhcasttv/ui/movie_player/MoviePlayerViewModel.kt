@@ -1,5 +1,6 @@
 package com.example.sakhcasttv.ui.movie_player
 
+import android.util.Log
 import androidx.annotation.OptIn
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -77,6 +78,9 @@ class MoviePlayerViewModel @Inject constructor(
     private val _currentResizeModeName = MutableStateFlow("Подогнать")
     val currentResizeModeName: StateFlow<String> = _currentResizeModeName.asStateFlow()
 
+    private val _showContinueDialog = MutableStateFlow(false)
+    val showContinueDialog: StateFlow<Boolean> = _showContinueDialog.asStateFlow()
+
     private var baseUrl: String = ""
 
     data class MovieWatchState(
@@ -118,10 +122,12 @@ class MoviePlayerViewModel @Inject constructor(
                     Player.STATE_ENDED -> {
                         stopPlayback()
                     }
+
                     Player.STATE_READY -> {
                         _duration.value = player.duration
                         startPositionUpdates()
                     }
+
                     else -> {
                         stopPositionUpdates()
                     }
@@ -365,10 +371,29 @@ class MoviePlayerViewModel @Inject constructor(
             val uri = movieWatchState.value.hlsUri
             player.setMediaItem(MediaItem.fromUri(uri))
             player.prepare()
-            player.seekTo(movieWatchState.value.position.toLong())
-            player.play()
+
+            delay(1000)
+            if (movieWatchState.value.position > 60) {
+                _showContinueDialog.value = true
+            } else {
+                player.seekTo(movieWatchState.value.position.toLong())
+                player.play()
+            }
             startPositionUpdates()
         }
+    }
+
+    fun continuePlaying(position: Int) {
+        Log.i("!!!", "VM position = $position, long = ${(position * 1000).toLong()}")
+        player.seekTo((position * 1000).toLong())
+        player.play()
+        _showContinueDialog.value = false
+    }
+
+    fun playFromBeginning() {
+        player.seekTo(0)
+        player.play()
+        _showContinueDialog.value = false
     }
 
     fun setMovieData(hlsUri: String, title: String, position: Int, movieAlphaId: String) {
