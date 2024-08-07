@@ -113,9 +113,7 @@ fun AuthNavGraph(
             val notificationScreenState by notificationScreenViewModel.notificationScreenState.collectAsState()
             val allScreensNotificationsState by mainScreensViewModel.notificationScreenState.collectAsState()
             LaunchedEffect(Unit) {
-                if (allScreensNotificationsState.notificationsList == null) {
-                    notificationScreenViewModel.getNotifications()
-                }
+                notificationScreenViewModel.getNotifications()
             }
             LaunchedEffect(notificationScreenState) {
                 if (!notificationScreenState.isLoading) {
