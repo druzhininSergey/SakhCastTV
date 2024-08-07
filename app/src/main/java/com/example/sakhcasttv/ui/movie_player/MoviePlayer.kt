@@ -55,11 +55,8 @@ import com.example.sakhcasttv.ui.movie_player.components.VideoPlayerControlsIcon
 import com.example.sakhcasttv.ui.movie_player.components.VideoPlayerMainFrame
 import com.example.sakhcasttv.ui.movie_player.components.VideoPlayerMediaTitle
 import com.example.sakhcasttv.ui.movie_player.components.VideoPlayerOverlay
-import com.example.sakhcasttv.ui.movie_player.components.VideoPlayerPulse
-import com.example.sakhcasttv.ui.movie_player.components.VideoPlayerPulseState
 import com.example.sakhcasttv.ui.movie_player.components.VideoPlayerSeeker
 import com.example.sakhcasttv.ui.movie_player.components.VideoPlayerState
-import com.example.sakhcasttv.ui.movie_player.components.rememberVideoPlayerPulseState
 import com.example.sakhcasttv.ui.movie_player.components.rememberVideoPlayerState
 import kotlinx.coroutines.delay
 import kotlin.time.DurationUnit
@@ -87,7 +84,6 @@ fun MoviePlayer(
     val lifecycleOwner = LocalLifecycleOwner.current
     val playerState = rememberVideoPlayerState(hideSeconds = 4)
     val focusRequester = remember { FocusRequester() }
-    val pulseState = rememberVideoPlayerPulseState()
 
     val availableQualities by playerViewModel.availableQualities.collectAsStateWithLifecycle()
     val currentQuality by playerViewModel.currentQuality.collectAsStateWithLifecycle()
@@ -149,7 +145,6 @@ fun MoviePlayer(
             .dPadEvents(
                 player = playerViewModel.player,
                 videoPlayerState = playerState,
-                pulseState = pulseState,
                 showExitSnackbar = showExitSnackbar,
                 onShowExitSnackbar = { showExitSnackbar = true },
                 onHideExitSnackbar = { showExitSnackbar = false },
@@ -180,9 +175,6 @@ fun MoviePlayer(
             isPlaying = isPlaying,
             state = playerState,
             focusRequester = focusRequester,
-            centerButton = {
-                VideoPlayerPulse(state = pulseState)
-            },
             controls = {
                 VideoPlayerMainFrame(
                     mediaActions = {
@@ -370,24 +362,13 @@ fun MoviePlayer(
 private fun Modifier.dPadEvents(
     player: Player,
     videoPlayerState: VideoPlayerState,
-    pulseState: VideoPlayerPulseState,
     showExitSnackbar: Boolean,
     onShowExitSnackbar: () -> Unit,
     onHideExitSnackbar: () -> Unit,
     navigateUp: () -> Boolean
 ): Modifier = this.handleDPadKeyEvents(
-    onLeft = {
-        if (!videoPlayerState.controlsVisible) {
-            player.seekBack()
-            pulseState.setType(VideoPlayerPulse.Type.BACK)
-        }
-    },
-    onRight = {
-        if (!videoPlayerState.controlsVisible) {
-            player.seekForward()
-            pulseState.setType(VideoPlayerPulse.Type.FORWARD)
-        }
-    },
+    onLeft = { videoPlayerState.showControls() },
+    onRight = { videoPlayerState.showControls() },
     onUp = { videoPlayerState.showControls() },
     onDown = { videoPlayerState.showControls() },
     onEnter = {
