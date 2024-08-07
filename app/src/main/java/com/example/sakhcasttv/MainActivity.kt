@@ -33,7 +33,6 @@ class MainActivity : ComponentActivity() {
             if (displayDialog.value) {
                 CustomDialog(
                     openDialogCustom = displayDialog,
-                    text = "Желаете выйти из приложения?",
                     onExitClick = { finish() }
                 )
             }

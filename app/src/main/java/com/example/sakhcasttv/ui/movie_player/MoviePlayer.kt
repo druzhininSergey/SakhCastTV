@@ -12,22 +12,24 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -43,7 +45,6 @@ import androidx.tv.material3.Surface
 import androidx.tv.material3.SurfaceDefaults
 import androidx.tv.material3.Text
 import com.example.sakhcasttv.R
-import com.example.sakhcasttv.ui.general.CustomDialog
 import com.example.sakhcasttv.ui.general.handleDPadKeyEvents
 import com.example.sakhcasttv.ui.movie_player.components.AudioTrackSelectionDialog
 import com.example.sakhcasttv.ui.movie_player.components.QualitySelectionDialog
@@ -102,7 +103,7 @@ fun MoviePlayer(
     val currentResizeModeName by playerViewModel.currentResizeModeName.collectAsStateWithLifecycle()
     var showResizeModeMessage by remember { mutableStateOf(false) }
 
-    val displayDialog = remember { mutableStateOf(false) }
+    var showExitSnackbar by remember { mutableStateOf(false) }
 
     LaunchedEffect(hls) {
         playerViewModel.setHlsManifest(hls)
@@ -142,21 +143,16 @@ fun MoviePlayer(
     Box(
         modifier = Modifier
             .dPadEvents(
-                playerViewModel.player,
-                playerState,
-                pulseState,
-                displayDialog
+                player = playerViewModel.player,
+                videoPlayerState = playerState,
+                pulseState = pulseState,
+                showExitSnackbar = showExitSnackbar,
+                onShowExitSnackbar = { showExitSnackbar = true },
+                onHideExitSnackbar = { showExitSnackbar = false },
+                navigateUp = navigateUp
             )
             .focusable()
     ) {
-        if (displayDialog.value) {
-            CustomDialog(
-                openDialogCustom = displayDialog,
-                text = "Выйти из плеера?",
-                navigateUp = { navigateUp() }
-            )
-        }
-
         AndroidView(
             modifier = Modifier.fillMaxSize(),
             factory = {
@@ -252,6 +248,40 @@ fun MoviePlayer(
                 )
             }
         )
+
+        if (showExitSnackbar) {
+            LaunchedEffect(Unit) {
+                delay(1500)
+                showExitSnackbar = false
+            }
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.BottomCenter
+            ) {
+                Surface(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .alpha(0.8f)
+                        .wrapContentSize(),
+                    shape = MaterialTheme.shapes.small,
+                    colors = SurfaceDefaults.colors(
+                        containerColor = MaterialTheme.colorScheme.surface.copy(
+                            alpha = 0.8f
+                        )
+                    ),
+                    tonalElevation = 2.dp
+                ) {
+                    Text(
+                        text = "Для выхода из плеера повторно нажмите кнопку \"Назад\"",
+                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+        }
+
         if (showResizeModeMessage) {
             LaunchedEffect(currentResizeModeName) {
                 delay(2000)
@@ -319,7 +349,10 @@ private fun Modifier.dPadEvents(
     player: Player,
     videoPlayerState: VideoPlayerState,
     pulseState: VideoPlayerPulseState,
-    openDialogCustom: MutableState<Boolean>,
+    showExitSnackbar: Boolean,
+    onShowExitSnackbar: () -> Unit,
+    onHideExitSnackbar: () -> Unit,
+    navigateUp: () -> Boolean
 ): Modifier = this.handleDPadKeyEvents(
     onLeft = {
         if (!videoPlayerState.controlsVisible) {
@@ -343,9 +376,13 @@ private fun Modifier.dPadEvents(
         if (videoPlayerState.controlsVisible) {
             videoPlayerState.hideControls()
             true
+        } else if (showExitSnackbar) {
+            onHideExitSnackbar()
+            navigateUp()
+            true
         } else {
-            openDialogCustom.value = true
-            false
+            onShowExitSnackbar()
+            true
         }
     }
 )

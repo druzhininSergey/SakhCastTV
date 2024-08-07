@@ -33,19 +33,11 @@ import androidx.tv.material3.Text
 import com.example.sakhcasttv.R
 
 @Composable
-fun CustomDialog(
-    openDialogCustom: MutableState<Boolean>,
-    text: String,
-    onExitClick: (() -> Unit)? = null,
-    navigateUp: (() -> Boolean)? = null,
-) {
+fun CustomDialog(openDialogCustom: MutableState<Boolean>, onExitClick: () -> Unit) {
     Dialog(onDismissRequest = { openDialogCustom.value = false }) {
-        CustomDialogUI(
-            openDialogCustom = openDialogCustom,
-            text = text,
-            onExitClick = onExitClick,
-            navigateUp = navigateUp
-        )
+        CustomDialogUI(openDialogCustom = openDialogCustom) {
+            onExitClick()
+        }
     }
 }
 
@@ -54,9 +46,7 @@ fun CustomDialog(
 fun CustomDialogUI(
     modifier: Modifier = Modifier,
     openDialogCustom: MutableState<Boolean>,
-    text: String,
-    onExitClick: (() -> Unit)? = null,
-    navigateUp: (() -> Boolean)? = null,
+    onExitClick: () -> Unit,
 ) {
     val focusRequester = remember { FocusRequester() }
 
@@ -98,7 +88,7 @@ fun CustomDialogUI(
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
-                    text = text,
+                    text = "Желаете выйти из приложения?",
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .padding(top = 10.dp, start = 25.dp, end = 25.dp)
@@ -130,8 +120,7 @@ fun CustomDialogUI(
                 TextButton(
                     onClick = {
                         openDialogCustom.value = false
-                        if (onExitClick != null) onExitClick()
-                        else if (navigateUp != null) navigateUp()
+                        onExitClick()
                     }, modifier = Modifier
                         .weight(1F),
                     shape = RoundedCornerShape(0.dp)
@@ -151,9 +140,5 @@ fun CustomDialogUI(
 @Preview(name = "Custom Dialog")
 @Composable
 fun MyDialogUIPreview() {
-    CustomDialogUI(
-        openDialogCustom = mutableStateOf(false),
-        text = "Желаете выйти из приложения?"
-
-    )
+    CustomDialogUI(openDialogCustom = mutableStateOf(false)) {}
 }
