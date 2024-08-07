@@ -31,9 +31,10 @@ class MainActivity : ComponentActivity() {
                 displayDialog.value = true
             }
             if (displayDialog.value) {
-                CustomDialog(openDialogCustom = displayDialog) {
-                    finish()
-                }
+                CustomDialog(
+                    openDialogCustom = displayDialog,
+                    onExitClick = { finish() }
+                )
             }
 
 

@@ -102,7 +102,6 @@ class SakhCastModule {
         return ExoPlayer.Builder(context).build()
     }
 
-
     @Provides
     @Singleton
     fun provideCrashReporter(): CrashReporter {
