@@ -11,6 +11,7 @@ import com.example.sakhcasttv.model.Result
 import com.example.sakhcasttv.model.Series
 import com.example.sakhcasttv.model.SeriesList
 import com.example.sakhcasttv.model.SeriesPlaylist
+import com.example.sakhcasttv.model.SpeedTest
 import retrofit2.Call
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -234,4 +235,6 @@ interface SakhCastApiService {
         @Query("person") personId: String,
     ): Call<MovieList>
 
+    @GET("v1/users/get_speedtest_url")
+    fun getSpeedtestUrl() : Call<SpeedTest>
 }

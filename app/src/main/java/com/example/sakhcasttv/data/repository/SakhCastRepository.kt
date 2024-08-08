@@ -13,6 +13,7 @@ import com.example.sakhcasttv.model.Result
 import com.example.sakhcasttv.model.Series
 import com.example.sakhcasttv.model.SeriesList
 import com.example.sakhcasttv.model.SeriesPlaylist
+import com.example.sakhcasttv.model.SpeedTest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -695,4 +696,20 @@ class SakhCastRepository @Inject constructor(
         }
     }
 
+    suspend fun getSpeedtestUrl(): SpeedTest? {
+        return withContext(ioDispatcher) {
+            try {
+                val call = sakhCastApiService.getSpeedtestUrl()
+                val response = call.execute()
+                response.body()
+            } catch (e: Exception) {
+                crashReporter.apply {
+                    logError("Error in fetchHlsManifest")
+                    setCustomKey("error_message", e.message ?: "Unknown error")
+                    recordException(e)
+                }
+                null
+            }
+        }
+    }
 }
