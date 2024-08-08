@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -42,11 +41,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerView
+import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Surface
 import androidx.tv.material3.SurfaceDefaults
 import androidx.tv.material3.Text
 import com.example.sakhcasttv.R
+import com.example.sakhcasttv.data.formatMinSec
 import com.example.sakhcasttv.ui.general.handleDPadKeyEvents
 import com.example.sakhcasttv.ui.movie_player.components.AudioTrackSelectionDialog
 import com.example.sakhcasttv.ui.movie_player.components.QualitySelectionDialog
@@ -87,15 +88,12 @@ fun MoviePlayer(
 
     val availableQualities by playerViewModel.availableQualities.collectAsStateWithLifecycle()
     val currentQuality by playerViewModel.currentQuality.collectAsStateWithLifecycle()
-    var showQualityDialog by remember { mutableStateOf(false) }
 
     val availableSubtitles by playerViewModel.availableSubtitles.collectAsStateWithLifecycle()
     val currentSubtitle by playerViewModel.currentSubtitle.collectAsStateWithLifecycle()
-    var showSubtitleDialog by remember { mutableStateOf(false) }
 
     val availableAudioTracks by playerViewModel.availableAudioTracks.collectAsStateWithLifecycle()
     val currentAudioTrack by playerViewModel.currentAudioTrack.collectAsStateWithLifecycle()
-    var showAudioTrackDialog by remember { mutableStateOf(false) }
 
     val currentResizeModeIndex by playerViewModel.currentResizeModeIndex.collectAsStateWithLifecycle()
     val currentResizeModeName by playerViewModel.currentResizeModeName.collectAsStateWithLifecycle()
@@ -104,6 +102,8 @@ fun MoviePlayer(
     val showContinueDialog by playerViewModel.showContinueDialog.collectAsStateWithLifecycle()
 
     var showExitSnackbar by remember { mutableStateOf(false) }
+
+    var currentDialog by remember { mutableStateOf(DialogType.NONE) }
 
     LaunchedEffect(hls) {
         playerViewModel.setHlsManifest(hls)
@@ -137,6 +137,13 @@ fun MoviePlayer(
             window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
+    }
+
+    fun switchDialog(direction: Int) {
+        val dialogs = DialogType.entries.filter { it != DialogType.NONE }
+        val currentIndex = dialogs.indexOf(currentDialog)
+        val newIndex = (currentIndex + direction + dialogs.size) % dialogs.size
+        currentDialog = dialogs[newIndex]
     }
 
     Box(
@@ -193,7 +200,7 @@ fun MoviePlayer(
                             VideoPlayerControlsIcon(
                                 icon = ImageVector.vectorResource(id = R.drawable.ic_cc),
                                 contentDescription = "Субтитры",
-                                onClick = { showSubtitleDialog = true },
+                                onClick = { currentDialog = DialogType.SUBTITLE },
                                 state = playerState,
                                 isPlaying = isPlaying
                             )
@@ -202,7 +209,7 @@ fun MoviePlayer(
                             VideoPlayerControlsIcon(
                                 icon = ImageVector.vectorResource(id = R.drawable.ic_audio_list),
                                 contentDescription = "Аудиодорожки",
-                                onClick = { showAudioTrackDialog = true },
+                                onClick = { currentDialog = DialogType.AUDIO_TRACK },
                                 state = playerState,
                                 isPlaying = isPlaying
                             )
@@ -211,7 +218,7 @@ fun MoviePlayer(
                             VideoPlayerControlsIcon(
                                 icon = Icons.Default.Settings,
                                 contentDescription = "Качество видео",
-                                onClick = { showQualityDialog = true },
+                                onClick = { currentDialog = DialogType.QUALITY },
                                 state = playerState,
                                 isPlaying = isPlaying
                             )
@@ -260,9 +267,7 @@ fun MoviePlayer(
                         .wrapContentSize(),
                     shape = MaterialTheme.shapes.small,
                     colors = SurfaceDefaults.colors(
-                        containerColor = MaterialTheme.colorScheme.surface.copy(
-                            alpha = 0.9f
-                        )
+                        containerColor = MaterialTheme.colorScheme.onSurface
                     ),
                     tonalElevation = 2.dp
                 ) {
@@ -270,7 +275,7 @@ fun MoviePlayer(
                         text = "Для выхода из плеера повторно нажмите кнопку \"Назад\"",
                         modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = MaterialTheme.colorScheme.surface,
                         textAlign = TextAlign.Center
                     )
                 }
@@ -304,58 +309,70 @@ fun MoviePlayer(
                 }
             }
         }
-        if (showQualityDialog) {
-            QualitySelectionDialog(
-                qualities = availableQualities,
-                currentQuality = currentQuality,
-                onQualitySelected = { quality ->
-                    playerViewModel.setQuality(quality)
-                    showQualityDialog = false
-                },
-                onDismiss = { showQualityDialog = false }
-            )
+
+        when (currentDialog) {
+            DialogType.QUALITY -> {
+                QualitySelectionDialog(
+                    qualities = availableQualities,
+                    currentQuality = currentQuality,
+                    onQualitySelected = { quality ->
+                        playerViewModel.setQuality(quality)
+                    },
+                    onDismiss = { currentDialog = DialogType.NONE },
+                    onNavigate = { direction -> switchDialog(direction) }
+                )
+            }
+
+            DialogType.SUBTITLE -> {
+                SubtitleSelectionDialog(
+                    subtitles = availableSubtitles,
+                    currentSubtitle = currentSubtitle,
+                    onSubtitleSelected = { subtitle ->
+                        playerViewModel.setSubtitle(subtitle)
+                    },
+                    onDismiss = { currentDialog = DialogType.NONE },
+                    onNavigate = { direction -> switchDialog(direction) }
+                )
+            }
+
+            DialogType.AUDIO_TRACK -> {
+                AudioTrackSelectionDialog(
+                    audioTracks = availableAudioTracks,
+                    currentAudioTrack = currentAudioTrack,
+                    onAudioTrackSelected = { audioTrack ->
+                        playerViewModel.setAudioTrack(audioTrack)
+                    },
+                    onDismiss = { currentDialog = DialogType.NONE },
+                    onNavigate = { direction -> switchDialog(direction) }
+                )
+            }
+
+            DialogType.NONE -> {}
         }
-        if (showSubtitleDialog) {
-            SubtitleSelectionDialog(
-                subtitles = availableSubtitles,
-                currentSubtitle = currentSubtitle,
-                onSubtitleSelected = { subtitle ->
-                    playerViewModel.setSubtitle(subtitle)
-                    showSubtitleDialog = false
-                },
-                onDismiss = { showSubtitleDialog = false }
-            )
-        }
-        if (showAudioTrackDialog) {
-            AudioTrackSelectionDialog(
-                audioTracks = availableAudioTracks,
-                currentAudioTrack = currentAudioTrack,
-                onAudioTrackSelected = { audioTrack ->
-                    playerViewModel.setAudioTrack(audioTrack)
-                    showAudioTrackDialog = false
-                },
-                onDismiss = { showAudioTrackDialog = false }
-            )
-        }
+
         if (showContinueDialog) {
             AlertDialog(
                 containerColor = MaterialTheme.colorScheme.surface,
                 textContentColor = MaterialTheme.colorScheme.onSurface,
                 onDismissRequest = { playerViewModel.playFromBeginning() },
-                text = { Text("Продолжить с ${movieState.position / 60} минут?") },
+                text = { Text("Продолжить с ${movieState.position.formatMinSec()}?") },
                 confirmButton = {
-                    TextButton(onClick = { playerViewModel.continuePlaying(position = position) }) {
+                    Button(onClick = { playerViewModel.continuePlaying(position = position) }) {
                         Text("Да")
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = { playerViewModel.playFromBeginning() }) {
-                        Text("Нет, начать сначала")
+                    Button(onClick = { playerViewModel.playFromBeginning() }) {
+                        Text("Начать сначала")
                     }
                 }
             )
         }
     }
+}
+
+enum class DialogType {
+    QUALITY, SUBTITLE, AUDIO_TRACK, NONE
 }
 
 private fun Modifier.dPadEvents(
@@ -366,10 +383,18 @@ private fun Modifier.dPadEvents(
     onHideExitSnackbar: () -> Unit,
     navigateUp: () -> Boolean
 ): Modifier = this.handleDPadKeyEvents(
-    onLeft = { videoPlayerState.showControls() },
-    onRight = { videoPlayerState.showControls() },
-    onUp = { videoPlayerState.showControls() },
-    onDown = { videoPlayerState.showControls() },
+    onLeft = {
+        videoPlayerState.showControls()
+    },
+    onRight = {
+        videoPlayerState.showControls()
+    },
+    onUp = {
+        videoPlayerState.showControls()
+    },
+    onDown = {
+        videoPlayerState.showControls()
+    },
     onEnter = {
         player.pause()
         videoPlayerState.showControls()
@@ -381,7 +406,6 @@ private fun Modifier.dPadEvents(
         } else if (showExitSnackbar) {
             onHideExitSnackbar()
             navigateUp()
-            true
         } else {
             onShowExitSnackbar()
             true
