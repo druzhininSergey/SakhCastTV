@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -42,11 +41,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerView
+import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Surface
 import androidx.tv.material3.SurfaceDefaults
 import androidx.tv.material3.Text
 import com.example.sakhcasttv.R
+import com.example.sakhcasttv.data.formatMinSec
 import com.example.sakhcasttv.ui.general.handleDPadKeyEvents
 import com.example.sakhcasttv.ui.movie_player.components.AudioTrackSelectionDialog
 import com.example.sakhcasttv.ui.movie_player.components.QualitySelectionDialog
@@ -266,9 +267,7 @@ fun MoviePlayer(
                         .wrapContentSize(),
                     shape = MaterialTheme.shapes.small,
                     colors = SurfaceDefaults.colors(
-                        containerColor = MaterialTheme.colorScheme.surface.copy(
-                            alpha = 0.9f
-                        )
+                        containerColor = MaterialTheme.colorScheme.onSurface
                     ),
                     tonalElevation = 2.dp
                 ) {
@@ -276,7 +275,7 @@ fun MoviePlayer(
                         text = "Для выхода из плеера повторно нажмите кнопку \"Назад\"",
                         modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = MaterialTheme.colorScheme.surface,
                         textAlign = TextAlign.Center
                     )
                 }
@@ -356,15 +355,15 @@ fun MoviePlayer(
                 containerColor = MaterialTheme.colorScheme.surface,
                 textContentColor = MaterialTheme.colorScheme.onSurface,
                 onDismissRequest = { playerViewModel.playFromBeginning() },
-                text = { Text("Продолжить с ${movieState.position / 60} минут?") },
+                text = { Text("Продолжить с ${movieState.position.formatMinSec()}?") },
                 confirmButton = {
-                    TextButton(onClick = { playerViewModel.continuePlaying(position = position) }) {
+                    Button(onClick = { playerViewModel.continuePlaying(position = position) }) {
                         Text("Да")
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = { playerViewModel.playFromBeginning() }) {
-                        Text("Нет, начать сначала")
+                    Button(onClick = { playerViewModel.playFromBeginning() }) {
+                        Text("Начать сначала")
                     }
                 }
             )
