@@ -1,5 +1,6 @@
 package com.example.sakhcasttv.ui.movie_player
 
+import android.util.Log
 import androidx.annotation.OptIn
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -202,28 +203,43 @@ class MoviePlayerViewModel @Inject constructor(
 
     fun setAudioTrack(audioTrack: AudioTrackReceived) {
         viewModelScope.launch {
-            _currentAudioTrack.value = audioTrack
+            try {
+                Log.d("!!!", "Attempting to set audio track: ${audioTrack.name}")
+                _currentAudioTrack.value = audioTrack
 
-            player.trackSelectionParameters = player.trackSelectionParameters.buildUpon()
-                .setPreferredAudioLanguage(audioTrack.language)
-                .build()
+                player.trackSelectionParameters = player.trackSelectionParameters.buildUpon()
+                    .clearOverridesOfType(C.TRACK_TYPE_AUDIO)
+                    .build()
 
-            player.currentTracks.groups
-                .filter { it.type == C.TRACK_TYPE_AUDIO }
-                .forEach { group ->
-                    for (i in 0 until group.length) {
-                        val format = group.getTrackFormat(i)
-                        if (format.language == audioTrack.language && format.label == audioTrack.name) {
-                            (player as ExoPlayer).trackSelectionParameters =
-                                player.trackSelectionParameters.buildUpon()
-                                    .addOverride(TrackSelectionOverride(group.mediaTrackGroup, i))
-                                    .build()
-                            break
+                player.trackSelectionParameters = player.trackSelectionParameters.buildUpon()
+                    .setPreferredAudioLanguage(audioTrack.language)
+                    .build()
+
+                player.currentTracks.groups
+                    .filter { it.type == C.TRACK_TYPE_AUDIO }
+                    .forEach { group ->
+                        for (i in 0 until group.length) {
+                            val format = group.getTrackFormat(i)
+                            if (format.language == audioTrack.language && format.label == audioTrack.name) {
+                                (player as ExoPlayer).trackSelectionParameters =
+                                    player.trackSelectionParameters.buildUpon()
+                                        .addOverride(
+                                            TrackSelectionOverride(
+                                                group.mediaTrackGroup,
+                                                i
+                                            )
+                                        )
+                                        .build()
+                                break
+                            }
                         }
                     }
-                }
 
-            (player as ExoPlayer).trackSelectionParameters = player.trackSelectionParameters
+                (player as ExoPlayer).trackSelectionParameters = player.trackSelectionParameters
+                Log.d("!!!", "Audio track set to: ${_currentAudioTrack.value?.name}")
+            } catch (e: Exception) {
+                Log.e("!!!", "Error setting audio track", e)
+            }
         }
     }
 
@@ -448,7 +464,7 @@ class MoviePlayerViewModel @Inject constructor(
                     val currentPosition = (player.currentPosition / 1000).toInt()
                     sakhCastRepository.setMoviePosition(movieAlphaId, currentPosition)
                     _movieWatchState.value = _movieWatchState.value.copy(position = currentPosition)
-                } else{
+                } else {
                     delay(5000)
                     continue
                 }
