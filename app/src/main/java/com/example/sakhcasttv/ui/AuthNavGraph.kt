@@ -38,6 +38,7 @@ import com.example.sakhcasttv.ui.movie_player.MoviePlayer
 import com.example.sakhcasttv.ui.movie_series_view.MovieView
 import com.example.sakhcasttv.ui.movie_series_view.SeriesView
 import com.example.sakhcasttv.ui.profile_screen.ProfileScreen
+import com.example.sakhcasttv.ui.series_player.SeriesPlayer
 
 @Composable
 fun AuthNavGraph(
@@ -195,14 +196,14 @@ fun AuthNavGraph(
                 navigateUp = navigateUp,
             )
         }
-//        composable("$SERIES_PLAYER/{seasonId}/{seriesTitle}/{episodeChosenIndex}/{rgChosen}") { backStackEntry ->
-//            val seasonId = backStackEntry.arguments?.getString("seasonId") ?: ""
-//            val seriesTitle = backStackEntry.arguments?.getString("seriesTitle") ?: ""
-//            val episodeChosenIndex =
-//                backStackEntry.arguments?.getString("episodeChosenIndex") ?: "1"
-//            val episodeChosenIndexInt = episodeChosenIndex.toInt()
-//            val rgChosen = backStackEntry.arguments?.getString("rgChosen") ?: ""
-//
+        composable("$SERIES_PLAYER/{seasonId}/{seriesTitle}/{episodeChosenIndex}/{rgChosen}") { backStackEntry ->
+            val seasonId = backStackEntry.arguments?.getString("seasonId") ?: ""
+            val seriesTitle = backStackEntry.arguments?.getString("seriesTitle") ?: ""
+            val episodeChosenIndex =
+                backStackEntry.arguments?.getString("episodeChosenIndex") ?: "1"
+            val episodeChosenIndexInt = episodeChosenIndex.toInt()
+            val rgChosen = backStackEntry.arguments?.getString("rgChosen") ?: ""
+
 //            val initialized = rememberSaveable { mutableStateOf(false) }
 //            val seriesPlayerViewModel: SeriesPlayerViewModel = hiltViewModel()
 //            LaunchedEffect(seasonId) {
@@ -224,15 +225,14 @@ fun AuthNavGraph(
 //            LaunchedEffect(isDataLoaded) {
 //                if (isDataLoaded) seriesPlayerViewModel.startPlayer()
 //            }
-//
-//            SeriesPlayer(
-//                navigateUp = navigateUp,
-//                isPlayListLoaded,
-//                isDataLoaded,
-//                seriesState,
-//                seriesPlayerViewModel.player,
-//                seriesPlayerViewModel::onEpisodeChanged,
-//            )
-//        }
+
+            SeriesPlayer(
+                seasonId = seasonId,
+                seriesTitle = seriesTitle,
+                episodeIndex = episodeChosenIndexInt,
+                rgChosen = rgChosen,
+                navigateUp = navigateUp
+            )
+        }
     }
 }

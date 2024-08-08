@@ -25,15 +25,15 @@ import androidx.tv.material3.ListItem
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
+import com.example.sakhcasttv.model.AudioTrackReceived
 import com.example.sakhcasttv.ui.general.handleDPadKeyEvents
-import com.example.sakhcasttv.ui.movie_player.MoviePlayerViewModel
 
 @OptIn(UnstableApi::class)
 @Composable
 fun AudioTrackSelectionDialog(
-    audioTracks: List<MoviePlayerViewModel.AudioTrackReceived>,
-    currentAudioTrack: MoviePlayerViewModel.AudioTrackReceived?,
-    onAudioTrackSelected: (MoviePlayerViewModel.AudioTrackReceived) -> Unit,
+    audioTracks: List<AudioTrackReceived>,
+    currentAudioTrack: AudioTrackReceived?,
+    onAudioTrackSelected: (AudioTrackReceived) -> Unit,
     onDismiss: () -> Unit,
     onNavigate: (Int) -> Unit
 ) {

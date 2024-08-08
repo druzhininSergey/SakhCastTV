@@ -25,15 +25,15 @@ import androidx.tv.material3.ListItem
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
+import com.example.sakhcasttv.model.VideoQuality
 import com.example.sakhcasttv.ui.general.handleDPadKeyEvents
-import com.example.sakhcasttv.ui.movie_player.MoviePlayerViewModel
 
 @OptIn(UnstableApi::class)
 @Composable
 fun QualitySelectionDialog(
-    qualities: List<MoviePlayerViewModel.VideoQuality>,
-    currentQuality: MoviePlayerViewModel.VideoQuality?,
-    onQualitySelected: (MoviePlayerViewModel.VideoQuality) -> Unit,
+    qualities: List<VideoQuality>,
+    currentQuality: VideoQuality?,
+    onQualitySelected: (VideoQuality) -> Unit,
     onDismiss: () -> Unit,
     onNavigate: (Int) -> Unit
 ) {

@@ -14,6 +14,9 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.ui.AspectRatioFrameLayout
 import com.example.sakhcasttv.data.repository.SakhCastRepository
+import com.example.sakhcasttv.model.AudioTrackReceived
+import com.example.sakhcasttv.model.Subtitle
+import com.example.sakhcasttv.model.VideoQuality
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -89,16 +92,6 @@ class MoviePlayerViewModel @Inject constructor(
         var position: Int = 0,
         var movieAlphaId: String = "",
     )
-
-    data class VideoQuality(
-        val resolution: String,
-        val bandwidth: Int,
-        val uri: String
-    )
-
-    data class Subtitle(val id: String, val name: String, val language: String)
-
-    data class AudioTrackReceived(val id: String, val name: String, val language: String)
 
     private val playerListener =
         object : Player.Listener {
