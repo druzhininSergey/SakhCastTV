@@ -87,15 +87,12 @@ fun MoviePlayer(
 
     val availableQualities by playerViewModel.availableQualities.collectAsStateWithLifecycle()
     val currentQuality by playerViewModel.currentQuality.collectAsStateWithLifecycle()
-    var showQualityDialog by remember { mutableStateOf(false) }
 
     val availableSubtitles by playerViewModel.availableSubtitles.collectAsStateWithLifecycle()
     val currentSubtitle by playerViewModel.currentSubtitle.collectAsStateWithLifecycle()
-    var showSubtitleDialog by remember { mutableStateOf(false) }
 
     val availableAudioTracks by playerViewModel.availableAudioTracks.collectAsStateWithLifecycle()
     val currentAudioTrack by playerViewModel.currentAudioTrack.collectAsStateWithLifecycle()
-    var showAudioTrackDialog by remember { mutableStateOf(false) }
 
     val currentResizeModeIndex by playerViewModel.currentResizeModeIndex.collectAsStateWithLifecycle()
     val currentResizeModeName by playerViewModel.currentResizeModeName.collectAsStateWithLifecycle()
@@ -104,6 +101,8 @@ fun MoviePlayer(
     val showContinueDialog by playerViewModel.showContinueDialog.collectAsStateWithLifecycle()
 
     var showExitSnackbar by remember { mutableStateOf(false) }
+
+    var currentDialog by remember { mutableStateOf(DialogType.NONE) }
 
     LaunchedEffect(hls) {
         playerViewModel.setHlsManifest(hls)
@@ -137,6 +136,13 @@ fun MoviePlayer(
             window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
+    }
+
+    fun switchDialog(direction: Int) {
+        val dialogs = DialogType.entries.filter { it != DialogType.NONE }
+        val currentIndex = dialogs.indexOf(currentDialog)
+        val newIndex = (currentIndex + direction + dialogs.size) % dialogs.size
+        currentDialog = dialogs[newIndex]
     }
 
     Box(
@@ -193,7 +199,7 @@ fun MoviePlayer(
                             VideoPlayerControlsIcon(
                                 icon = ImageVector.vectorResource(id = R.drawable.ic_cc),
                                 contentDescription = "Субтитры",
-                                onClick = { showSubtitleDialog = true },
+                                onClick = { currentDialog = DialogType.SUBTITLE },
                                 state = playerState,
                                 isPlaying = isPlaying
                             )
@@ -202,7 +208,7 @@ fun MoviePlayer(
                             VideoPlayerControlsIcon(
                                 icon = ImageVector.vectorResource(id = R.drawable.ic_audio_list),
                                 contentDescription = "Аудиодорожки",
-                                onClick = { showAudioTrackDialog = true },
+                                onClick = { currentDialog = DialogType.AUDIO_TRACK },
                                 state = playerState,
                                 isPlaying = isPlaying
                             )
@@ -211,7 +217,7 @@ fun MoviePlayer(
                             VideoPlayerControlsIcon(
                                 icon = Icons.Default.Settings,
                                 contentDescription = "Качество видео",
-                                onClick = { showQualityDialog = true },
+                                onClick = { currentDialog = DialogType.QUALITY },
                                 state = playerState,
                                 isPlaying = isPlaying
                             )
@@ -304,39 +310,47 @@ fun MoviePlayer(
                 }
             }
         }
-        if (showQualityDialog) {
-            QualitySelectionDialog(
-                qualities = availableQualities,
-                currentQuality = currentQuality,
-                onQualitySelected = { quality ->
-                    playerViewModel.setQuality(quality)
-                    showQualityDialog = false
-                },
-                onDismiss = { showQualityDialog = false }
-            )
+
+        when (currentDialog) {
+            DialogType.QUALITY -> {
+                QualitySelectionDialog(
+                    qualities = availableQualities,
+                    currentQuality = currentQuality,
+                    onQualitySelected = { quality ->
+                        playerViewModel.setQuality(quality)
+                    },
+                    onDismiss = { currentDialog = DialogType.NONE },
+                    onNavigate = { direction -> switchDialog(direction) }
+                )
+            }
+
+            DialogType.SUBTITLE -> {
+                SubtitleSelectionDialog(
+                    subtitles = availableSubtitles,
+                    currentSubtitle = currentSubtitle,
+                    onSubtitleSelected = { subtitle ->
+                        playerViewModel.setSubtitle(subtitle)
+                    },
+                    onDismiss = { currentDialog = DialogType.NONE },
+                    onNavigate = { direction -> switchDialog(direction) }
+                )
+            }
+
+            DialogType.AUDIO_TRACK -> {
+                AudioTrackSelectionDialog(
+                    audioTracks = availableAudioTracks,
+                    currentAudioTrack = currentAudioTrack,
+                    onAudioTrackSelected = { audioTrack ->
+                        playerViewModel.setAudioTrack(audioTrack)
+                    },
+                    onDismiss = { currentDialog = DialogType.NONE },
+                    onNavigate = { direction -> switchDialog(direction) }
+                )
+            }
+
+            DialogType.NONE -> {}
         }
-        if (showSubtitleDialog) {
-            SubtitleSelectionDialog(
-                subtitles = availableSubtitles,
-                currentSubtitle = currentSubtitle,
-                onSubtitleSelected = { subtitle ->
-                    playerViewModel.setSubtitle(subtitle)
-                    showSubtitleDialog = false
-                },
-                onDismiss = { showSubtitleDialog = false }
-            )
-        }
-        if (showAudioTrackDialog) {
-            AudioTrackSelectionDialog(
-                audioTracks = availableAudioTracks,
-                currentAudioTrack = currentAudioTrack,
-                onAudioTrackSelected = { audioTrack ->
-                    playerViewModel.setAudioTrack(audioTrack)
-                    showAudioTrackDialog = false
-                },
-                onDismiss = { showAudioTrackDialog = false }
-            )
-        }
+
         if (showContinueDialog) {
             AlertDialog(
                 containerColor = MaterialTheme.colorScheme.surface,
@@ -358,6 +372,10 @@ fun MoviePlayer(
     }
 }
 
+enum class DialogType {
+    QUALITY, SUBTITLE, AUDIO_TRACK, NONE
+}
+
 private fun Modifier.dPadEvents(
     player: Player,
     videoPlayerState: VideoPlayerState,
@@ -366,10 +384,18 @@ private fun Modifier.dPadEvents(
     onHideExitSnackbar: () -> Unit,
     navigateUp: () -> Boolean
 ): Modifier = this.handleDPadKeyEvents(
-    onLeft = { videoPlayerState.showControls() },
-    onRight = { videoPlayerState.showControls() },
-    onUp = { videoPlayerState.showControls() },
-    onDown = { videoPlayerState.showControls() },
+    onLeft = {
+        videoPlayerState.showControls()
+    },
+    onRight = {
+        videoPlayerState.showControls()
+    },
+    onUp = {
+        videoPlayerState.showControls()
+    },
+    onDown = {
+        videoPlayerState.showControls()
+    },
     onEnter = {
         player.pause()
         videoPlayerState.showControls()
@@ -381,7 +407,6 @@ private fun Modifier.dPadEvents(
         } else if (showExitSnackbar) {
             onHideExitSnackbar()
             navigateUp()
-            true
         } else {
             onShowExitSnackbar()
             true
