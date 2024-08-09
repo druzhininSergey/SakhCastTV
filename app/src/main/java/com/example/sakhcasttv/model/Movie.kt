@@ -41,7 +41,7 @@ data class Movie(
     @SerialName("runtime") val runtime: Int?,
     @SerialName("sources") val sources: Sources,
     @SerialName("status") val status: String,
-    @SerialName("subtitles") val subtitles: List<Subtitle>,
+    @SerialName("subtitles") val subtitleMovieCards: List<SubtitleMovieCard>,
     @SerialName("tagline") val tagline: String?,
     @SerialName("url") val url: String,
     @SerialName("user") val userFavourite: UserFavourite,
@@ -162,7 +162,7 @@ data class Sources(
 )
 
 @Serializable
-data class Subtitle(
+data class SubtitleMovieCard(
     @SerialName("id") val id: Int,
     @SerialName("iso_639_1") val iso6391: String,
     @SerialName("title") val title: String,

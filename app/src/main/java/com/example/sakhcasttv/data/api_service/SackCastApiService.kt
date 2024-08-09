@@ -1,6 +1,7 @@
 package com.example.sakhcasttv.data.api_service
 
 import com.example.sakhcasttv.model.CurrentUser
+import com.example.sakhcasttv.model.Episode
 import com.example.sakhcasttv.model.LastWatched
 import com.example.sakhcasttv.model.LoginResponse
 import com.example.sakhcasttv.model.Movie
@@ -10,6 +11,7 @@ import com.example.sakhcasttv.model.Result
 import com.example.sakhcasttv.model.Series
 import com.example.sakhcasttv.model.SeriesList
 import com.example.sakhcasttv.model.SeriesPlaylist
+import com.example.sakhcasttv.model.SpeedTest
 import retrofit2.Call
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -67,10 +69,10 @@ interface SakhCastApiService {
         @Query("id") id: Int
     ): Call<Series>
 
-//    @GET("v1/serials/get_episodes")
-//    fun getSeriesEpisodesBySeasonId(
-//        @Query("season_id") seasonId: Int
-//    ): Call<List<Episode>>
+    @GET("v1/serials/get_episodes")
+    fun getSeriesEpisodesBySeasonId(
+        @Query("season_id") seasonId: Int
+    ): Call<List<Episode>>
 
     @GET("catalog.items")
     fun getSeriesFavorites(
@@ -233,4 +235,6 @@ interface SakhCastApiService {
         @Query("person") personId: String,
     ): Call<MovieList>
 
+    @GET("v1/users/get_speedtest_url")
+    fun getSpeedtestUrl() : Call<SpeedTest>
 }

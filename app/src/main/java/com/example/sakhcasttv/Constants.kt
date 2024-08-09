@@ -13,6 +13,7 @@ const val SERIES_VIEW = "series_view"
 const val PLAYER = "player"
 const val SERIES_PLAYER = "series_player"
 const val PROFILE_SCREEN = "profile_screen"
+const val SPEED_TEST_SCREEN = "speed_test_screen"
 const val BASE_URL = "https://api.sakh.tv"
 
 const val SHARED_PREFS_TOKEN_KEY = "shared_preferences_token"

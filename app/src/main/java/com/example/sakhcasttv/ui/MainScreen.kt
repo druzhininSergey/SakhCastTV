@@ -54,15 +54,6 @@ fun AuthenticatedMainScreen(
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStackEntry?.destination?.route
 
-//    val isTopBarVisible = remember(key1 = backStackState) {
-//        currentDestination != "$SERIES_CATEGORY_SCREEN/{category}/{name}" &&
-//                currentDestination != "$MOVIE_CATEGORY_SCREEN/{category}/{genresId}" &&
-//                currentDestination != "$MOVIE_VIEW/{movieId}" &&
-//                currentDestination != "$SERIES_VIEW/{seriesId}" &&
-//                currentDestination != SEARCH_SCREEN &&
-//                currentDestination != "$PLAYER/{hls}/{title}/{position}/{movieAlphaId}" &&
-//                currentDestination != "$SERIES_PLAYER/{seasonId}/{seriesTitle}/{episodeChosenIndex}/{rgChosen}"
-//    }
     val isTopBarVisible = remember(key1 = backStackState) {
         currentDestination != "$SERIES_CATEGORY_SCREEN/{category}/{name}" &&
                 currentDestination != "$MOVIE_CATEGORY_SCREEN/{category}/{genresId}" &&
@@ -71,14 +62,12 @@ fun AuthenticatedMainScreen(
                 currentDestination != "$PLAYER/{hls}/{title}/{position}/{movieAlphaId}" &&
                 currentDestination != PROFILE_SCREEN &&
                 currentDestination != "test$PLAYER/{hls}/{title}/{position}/{movieAlphaId}" &&
-                currentDestination != "$SERIES_PLAYER/{seasonId}/{seriesTitle}/{episodeChosenIndex}/{rgChosen}"
+                currentDestination != "$SERIES_PLAYER/{seasonId}/{seriesId}/{episodeChosenIndex}/{rgChosen}"
     }
 
     Scaffold(
         topBar = { if (isTopBarVisible) TvTopBar(navController = navController, user) }
     ) { paddingValues ->
-
-
         AuthNavGraph(
             navHostController = navController,
             user = user,
@@ -86,5 +75,4 @@ fun AuthenticatedMainScreen(
             onLogoutButtonPushed = onLogoutButtonPushed
         )
     }
-
 }

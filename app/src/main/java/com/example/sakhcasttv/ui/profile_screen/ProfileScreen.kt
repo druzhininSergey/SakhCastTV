@@ -15,7 +15,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,6 +25,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.Button
 import androidx.tv.material3.ButtonDefaults
 import androidx.tv.material3.Icon
@@ -34,9 +38,18 @@ import coil.request.ImageRequest
 import com.example.sakhcasttv.CURRENT_VERSION
 import com.example.sakhcasttv.Colors
 import com.example.sakhcasttv.model.CurrentUser
+import java.util.Locale
 
 @Composable
-fun ProfileScreen(user: CurrentUser?, onLogoutButtonPushed: () -> Unit, navigateUp: () -> Boolean) {
+fun ProfileScreen(
+    user: CurrentUser?,
+    onLogoutButtonPushed: () -> Unit,
+    navigateUp: () -> Boolean,
+    viewModel: ProfileViewModel = hiltViewModel()
+) {
+    val downloadSpeed by viewModel.downloadSpeed.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+
     val avatarPainter: Painter =
         rememberAsyncImagePainter(
             ImageRequest.Builder(LocalContext.current).data(data = user?.avatar)
@@ -60,7 +73,9 @@ fun ProfileScreen(user: CurrentUser?, onLogoutButtonPushed: () -> Unit, navigate
             }
         }
         Box(
-            modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(end = 16.dp),
             contentAlignment = Alignment.CenterEnd
         ) {
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
@@ -121,6 +136,37 @@ fun ProfileScreen(user: CurrentUser?, onLogoutButtonPushed: () -> Unit, navigate
             text = "Текущая версия: $CURRENT_VERSION",
             modifier = Modifier.padding(horizontal = 16.dp)
         )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Button(
+                colors = ButtonDefaults.colors(focusedContainerColor = MaterialTheme.colorScheme.onTertiaryContainer),
+                onClick = { viewModel.measureDownloadSpeed() },
+                modifier = Modifier
+                    .clip(MaterialTheme.shapes.small)
+            ) {
+                Text(text = "Измерить скорость загрузки", color = Colors.blueColor)
+            }
+
+            if (isLoading) {
+                CircularProgressIndicator(color = Colors.blueColor)
+            } else {
+                downloadSpeed?.let { speed ->
+                    Text(
+                        text = when {
+                            speed < 0 -> "Ошибка измерения"
+                            speed < 1 -> String.format(Locale.US,"%.2f Kbps", speed * 1000)
+                            else -> String.format(Locale.US,"%.2f Mbps", speed)
+                        }
+                    )
+                }
+            }
+        }
 
         Button(
             colors = ButtonDefaults.colors(focusedContainerColor = MaterialTheme.colorScheme.onTertiaryContainer),

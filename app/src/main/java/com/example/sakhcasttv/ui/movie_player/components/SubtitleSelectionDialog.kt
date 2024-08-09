@@ -25,15 +25,15 @@ import androidx.tv.material3.ListItem
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
+import com.example.sakhcasttv.model.Subtitle
 import com.example.sakhcasttv.ui.general.handleDPadKeyEvents
-import com.example.sakhcasttv.ui.movie_player.MoviePlayerViewModel
 
 @OptIn(UnstableApi::class)
 @Composable
 fun SubtitleSelectionDialog(
-    subtitles: List<MoviePlayerViewModel.Subtitle>,
-    currentSubtitle: MoviePlayerViewModel.Subtitle?,
-    onSubtitleSelected: (MoviePlayerViewModel.Subtitle) -> Unit,
+    subtitles: List<Subtitle>,
+    currentSubtitle: Subtitle?,
+    onSubtitleSelected: (Subtitle) -> Unit,
     onDismiss: () -> Unit,
     onNavigate: (Int) -> Unit
 ) {
