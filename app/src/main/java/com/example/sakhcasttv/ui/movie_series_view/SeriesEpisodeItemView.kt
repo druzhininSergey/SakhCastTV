@@ -28,6 +28,7 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -61,21 +62,22 @@ import com.example.sakhcasttv.model.SeriesEpisode
 fun SeriesEpisodeView(
     episodes: List<Season>?,
     navigateToSeriesPlayer: (String, String, String, String) -> Unit,
-    seasonId: Int,
-    seriesName: String,
+    seriesId: Int
 ) {
-    var focusedTabIndex by remember { mutableIntStateOf(0) }
-    var activeTabIndex by remember { mutableIntStateOf(focusedTabIndex) }
+    var focusedTabIndex by rememberSaveable { mutableIntStateOf(0) }
+    var activeTabIndex by rememberSaveable { mutableIntStateOf(focusedTabIndex) }
+
+    val firstSeasonId = episodes?.firstOrNull()?.id ?: 0
+    var currentSeasonIdChosen by rememberSaveable(firstSeasonId) { mutableIntStateOf(firstSeasonId) }
 
     Column {
         if (!episodes.isNullOrEmpty()) {
-
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 16.dp)
             ) {
-                Row (verticalAlignment = Alignment.CenterVertically){
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(text = "Сезоны:")
                     TabRow(
                         selectedTabIndex = focusedTabIndex,
@@ -100,7 +102,8 @@ fun SeriesEpisodeView(
                     ) {
                         repeat(episodes.size) { index ->
                             key(index) {
-                                val mutableInteractionSource = remember { MutableInteractionSource() }
+                                val mutableInteractionSource =
+                                    remember { MutableInteractionSource() }
                                 val isFocused by mutableInteractionSource.collectIsFocusedAsState()
                                 val isSelected = activeTabIndex == index
 
@@ -112,6 +115,7 @@ fun SeriesEpisodeView(
                                     onClick = {
                                         focusedTabIndex = index
                                         activeTabIndex = index
+                                        currentSeasonIdChosen = episodes[index].id
                                     },
                                     interactionSource = mutableInteractionSource,
                                     colors = CardDefaults.colors(
@@ -126,7 +130,10 @@ fun SeriesEpisodeView(
                                     Text(
                                         text = "${index + 1}",
                                         fontSize = 12.sp,
-                                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
+                                        modifier = Modifier.padding(
+                                            horizontal = 16.dp,
+                                            vertical = 6.dp
+                                        )
                                     )
                                 }
                             }
@@ -148,9 +155,9 @@ fun SeriesEpisodeView(
                     SeriesEpisodeItemView(
                         seriesEpisode = episode,
                         navigateToSeriesPlayer = navigateToSeriesPlayer,
-                        seasonId = seasonId,
-                        seriesName = seriesName,
+                        seasonId = currentSeasonIdChosen,
                         episodeChosenIndex = episode.index,
+                        seriesId = seriesId
                     )
                 }
             }
@@ -163,8 +170,8 @@ fun SeriesEpisodeItemView(
     seriesEpisode: SeriesEpisode,
     navigateToSeriesPlayer: (String, String, String, String) -> Unit,
     seasonId: Int,
-    seriesName: String,
     episodeChosenIndex: String,
+    seriesId: Int,
 ) {
 
     val imageUrl = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -205,7 +212,7 @@ fun SeriesEpisodeItemView(
             if (seriesEpisode.medias.size == 1) {
                 navigateToSeriesPlayer(
                     seasonId.toString(),
-                    seriesName,
+                    seriesId.toString(),
                     episodeChosenIndex,
                     seriesEpisode.medias[0].name
                 )
@@ -252,7 +259,12 @@ fun SeriesEpisodeItemView(
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp)
         ) {
-            Text(text = seriesEpisode.name, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 12.sp)
+            Text(
+                text = seriesEpisode.name,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                fontSize = 12.sp
+            )
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -281,7 +293,7 @@ fun SeriesEpisodeItemView(
                     onClick = {
                         navigateToSeriesPlayer(
                             seasonId.toString(),
-                            seriesName,
+                            seriesId.toString(),
                             episodeChosenIndex,
                             rgs.name
                         )

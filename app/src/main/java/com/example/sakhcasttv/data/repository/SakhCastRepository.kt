@@ -176,7 +176,8 @@ class SakhCastRepository @Inject constructor(
             try {
                 val seriesCall = sakhCastApiService.getSeriesById(seriesId)
                 val responseBody = seriesCall.execute()
-//                Log.i("!!!", "seriesCall}")
+//                Log.i("!!!", "seriesCall")
+//                Log.i("!!!", "${responseBody.body()}")
                 responseBody.body()
             } catch (e: Exception) {
                 crashReporter.apply {

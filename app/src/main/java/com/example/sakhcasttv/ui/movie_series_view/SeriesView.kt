@@ -156,8 +156,7 @@ fun SeriesView(
             SeriesEpisodeView(
                 episodes = seriesEpisodes,
                 navigateToSeriesPlayer = navigateToSeriesPlayer,
-                seasonId = series?.userLastSeasonId ?: 0,
-                seriesName = series?.name ?: ""
+                seriesId = seriesId ?: 0
             )
         }
     }

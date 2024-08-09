@@ -1,6 +1,5 @@
 package com.example.sakhcasttv.ui.movie_player
 
-import android.util.Log
 import androidx.annotation.OptIn
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -197,7 +196,6 @@ class MoviePlayerViewModel @Inject constructor(
     fun setAudioTrack(audioTrack: AudioTrackReceived) {
         viewModelScope.launch {
             try {
-                Log.d("!!!", "Attempting to set audio track: ${audioTrack.name}")
                 _currentAudioTrack.value = audioTrack
 
                 player.trackSelectionParameters = player.trackSelectionParameters.buildUpon()
@@ -229,9 +227,8 @@ class MoviePlayerViewModel @Inject constructor(
                     }
 
                 (player as ExoPlayer).trackSelectionParameters = player.trackSelectionParameters
-                Log.d("!!!", "Audio track set to: ${_currentAudioTrack.value?.name}")
             } catch (e: Exception) {
-                Log.e("!!!", "Error setting audio track", e)
+                e.stackTrace
             }
         }
     }

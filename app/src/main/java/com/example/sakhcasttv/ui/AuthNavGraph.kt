@@ -70,11 +70,11 @@ fun AuthNavGraph(
         { type: String, name: String -> navigate("$SERIES_CATEGORY_SCREEN/$type/$name") }
     val navigateToSeriesPlayer = {
             seasonId: String,
-            seriesTitle: String,
+            seriesId: String,
             episodeChosenIndex: String,
             rgChosen: String,
         ->
-        navigate("$SERIES_PLAYER/$seasonId/$seriesTitle/$episodeChosenIndex/$rgChosen")
+        navigate("$SERIES_PLAYER/$seasonId/$seriesId/$episodeChosenIndex/$rgChosen")
     }
 
     NavHost(
@@ -196,39 +196,17 @@ fun AuthNavGraph(
                 navigateUp = navigateUp,
             )
         }
-        composable("$SERIES_PLAYER/{seasonId}/{seriesTitle}/{episodeChosenIndex}/{rgChosen}") { backStackEntry ->
+        composable("$SERIES_PLAYER/{seasonId}/{seriesId}/{episodeChosenIndex}/{rgChosen}") { backStackEntry ->
             val seasonId = backStackEntry.arguments?.getString("seasonId") ?: ""
-            val seriesTitle = backStackEntry.arguments?.getString("seriesTitle") ?: ""
+            val seriesId = backStackEntry.arguments?.getString("seriesId")?.toInt() ?: 0
             val episodeChosenIndex =
                 backStackEntry.arguments?.getString("episodeChosenIndex") ?: "1"
             val episodeChosenIndexInt = episodeChosenIndex.toInt()
             val rgChosen = backStackEntry.arguments?.getString("rgChosen") ?: ""
 
-//            val initialized = rememberSaveable { mutableStateOf(false) }
-//            val seriesPlayerViewModel: SeriesPlayerViewModel = hiltViewModel()
-//            LaunchedEffect(seasonId) {
-//                if (!initialized.value) {
-//                    seriesPlayerViewModel.setSeriesData(
-//                        seasonId,
-//                        seriesTitle,
-//                        episodeChosenIndexInt,
-//                        rgChosen
-//                    )
-//                    seriesPlayerViewModel.getPlaylist(seasonId, rgChosen)
-//                    initialized.value = true
-//                }
-//            }
-//            val isPlayListLoaded by seriesPlayerViewModel.isPlaylistLoaded.collectAsState()
-//            val isDataLoaded by seriesPlayerViewModel.isDataLoaded.collectAsState()
-//            val seriesState by seriesPlayerViewModel.seriesWatchState.collectAsState()
-//
-//            LaunchedEffect(isDataLoaded) {
-//                if (isDataLoaded) seriesPlayerViewModel.startPlayer()
-//            }
-
             SeriesPlayer(
                 seasonId = seasonId,
-                seriesTitle = seriesTitle,
+                seriesId = seriesId,
                 episodeIndex = episodeChosenIndexInt,
                 rgChosen = rgChosen,
                 navigateUp = navigateUp
